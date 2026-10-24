@@ -16,11 +16,22 @@ export default async function handler(req, res) {
   
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const { pathname } = new URL(req.url, `http://${req.headers.host}`)
+  // Get pathname - handle both full URL and path-only
+  let pathname = req.url
+  try {
+    const url = new URL(req.url, `http://${req.headers.host}`)
+    pathname = url.pathname
+  } catch {
+    // If req.url is already just a path
+    pathname = req.url.split('?')[0]
+  }
+
+  console.log('🔍 Auth endpoint:', req.method, pathname)
 
   try {
     // POST /api/auth/register/student (support both / and -)
-    if ((pathname === '/api/auth/register-student' || pathname === '/api/auth/register/student') && req.method === 'POST') {
+    if ((pathname === '/api/auth/register-student' || pathname === '/api/auth/register/student' || pathname.endsWith('/register/student')) && req.method === 'POST') {
+      console.log('✅ Register student matched')
       const { name, username, password, kelas, gender } = req.body
 
       if (!name || !username || !password || !kelas) {
@@ -64,7 +75,8 @@ export default async function handler(req, res) {
     }
 
     // POST /api/auth/register/teacher (support both / and -)
-    if ((pathname === '/api/auth/register-teacher' || pathname === '/api/auth/register/teacher') && req.method === 'POST') {
+    if ((pathname === '/api/auth/register-teacher' || pathname === '/api/auth/register/teacher' || pathname.endsWith('/register/teacher')) && req.method === 'POST') {
+      console.log('✅ Register teacher matched')
       const { name, email, password, school } = req.body
 
       if (!name || !email || !password || !school) {
@@ -100,7 +112,8 @@ export default async function handler(req, res) {
     }
 
     // POST /api/auth/login/student (support both / and -)
-    if ((pathname === '/api/auth/login-student' || pathname === '/api/auth/login/student') && req.method === 'POST') {
+    if ((pathname === '/api/auth/login-student' || pathname === '/api/auth/login/student' || pathname.endsWith('/login/student')) && req.method === 'POST') {
+      console.log('✅ Login student matched')
       const { username, password } = req.body
 
       if (!username || !password) {
@@ -145,7 +158,8 @@ export default async function handler(req, res) {
     }
 
     // POST /api/auth/login/teacher (support both / and -)
-    if ((pathname === '/api/auth/login-teacher' || pathname === '/api/auth/login/teacher') && req.method === 'POST') {
+    if ((pathname === '/api/auth/login-teacher' || pathname === '/api/auth/login/teacher' || pathname.endsWith('/login/teacher')) && req.method === 'POST') {
+      console.log('✅ Login teacher matched')
       const { email, password } = req.body
 
       if (!email || !password) {
@@ -213,13 +227,14 @@ export default async function handler(req, res) {
       return res.json(user)
     }
 
-    return res.status(404).json({ error: 'Endpoint not found' })
+    console.log('❌ No endpoint matched:', pathname, req.method)
+    return res.status(404).json({ error: 'Endpoint not found', path: pathname, method: req.method })
 
   } catch (err) {
-    console.error('Auth error:', err)
+    console.error('❌ Auth error:', err)
     if (err.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Token tidak valid' })
     }
-    res.status(500).json({ error: 'Gagal memproses permintaan' })
+    res.status(500).json({ error: 'Gagal memproses permintaan', detail: err.message })
   }
 }
