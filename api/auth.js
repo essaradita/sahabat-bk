@@ -19,8 +19,8 @@ export default async function handler(req, res) {
   const { pathname } = new URL(req.url, `http://${req.headers.host}`)
 
   try {
-    // POST /api/auth/register-student
-    if (pathname === '/api/auth/register-student' && req.method === 'POST') {
+    // POST /api/auth/register/student (support both / and -)
+    if ((pathname === '/api/auth/register-student' || pathname === '/api/auth/register/student') && req.method === 'POST') {
       const { name, username, password, kelas, gender } = req.body
 
       if (!name || !username || !password || !kelas) {
@@ -63,8 +63,8 @@ export default async function handler(req, res) {
       })
     }
 
-    // POST /api/auth/register-teacher
-    if (pathname === '/api/auth/register-teacher' && req.method === 'POST') {
+    // POST /api/auth/register/teacher (support both / and -)
+    if ((pathname === '/api/auth/register-teacher' || pathname === '/api/auth/register/teacher') && req.method === 'POST') {
       const { name, email, password, school } = req.body
 
       if (!name || !email || !password || !school) {
@@ -99,8 +99,8 @@ export default async function handler(req, res) {
       })
     }
 
-    // POST /api/auth/login-student
-    if (pathname === '/api/auth/login-student' && req.method === 'POST') {
+    // POST /api/auth/login/student (support both / and -)
+    if ((pathname === '/api/auth/login-student' || pathname === '/api/auth/login/student') && req.method === 'POST') {
       const { username, password } = req.body
 
       if (!username || !password) {
@@ -144,8 +144,8 @@ export default async function handler(req, res) {
       })
     }
 
-    // POST /api/auth/login-teacher
-    if (pathname === '/api/auth/login-teacher' && req.method === 'POST') {
+    // POST /api/auth/login/teacher (support both / and -)
+    if ((pathname === '/api/auth/login-teacher' || pathname === '/api/auth/login/teacher') && req.method === 'POST') {
       const { email, password } = req.body
 
       if (!email || !password) {
