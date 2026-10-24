@@ -9,6 +9,26 @@ function generateToken(userId, role) {
   return jwt.sign({ userId, role }, process.env.JWT_SECRET, { expiresIn: '7d' })
 }
 
+// Helper to get request body (Vercel serverless parses it automatically)
+async function getBody(req) {
+  // Vercel automatically parses body for us
+  if (req.body) return req.body
+  
+  // Fallback: manual parsing
+  return new Promise((resolve, reject) => {
+    let data = ''
+    req.on('data', chunk => { data += chunk })
+    req.on('end', () => {
+      try {
+        resolve(data ? JSON.parse(data) : {})
+      } catch (e) {
+        reject(e)
+      }
+    })
+    req.on('error', reject)
+  })
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
@@ -27,12 +47,19 @@ export default async function handler(req, res) {
   }
 
   console.log('🔍 Auth endpoint:', req.method, pathname)
+  
+  // Parse body for POST requests
+  let body = {}
+  if (req.method === 'POST') {
+    body = await getBody(req)
+    console.log('📦 Request body keys:', Object.keys(body))
+  }
 
   try {
     // POST /api/auth/register/student (support both / and -)
     if ((pathname === '/api/auth/register-student' || pathname === '/api/auth/register/student' || pathname.endsWith('/register/student')) && req.method === 'POST') {
       console.log('✅ Register student matched')
-      const { name, username, password, kelas, gender } = req.body
+      const { name, username, password, kelas, gender } = body
 
       if (!name || !username || !password || !kelas) {
         return res.status(400).json({ error: 'Semua field wajib diisi' })
@@ -77,7 +104,7 @@ export default async function handler(req, res) {
     // POST /api/auth/register/teacher (support both / and -)
     if ((pathname === '/api/auth/register-teacher' || pathname === '/api/auth/register/teacher' || pathname.endsWith('/register/teacher')) && req.method === 'POST') {
       console.log('✅ Register teacher matched')
-      const { name, email, password, school } = req.body
+      const { name, email, password, school } = body
 
       if (!name || !email || !password || !school) {
         return res.status(400).json({ error: 'Semua field wajib diisi' })
@@ -114,7 +141,7 @@ export default async function handler(req, res) {
     // POST /api/auth/login/student (support both / and -)
     if ((pathname === '/api/auth/login-student' || pathname === '/api/auth/login/student' || pathname.endsWith('/login/student')) && req.method === 'POST') {
       console.log('✅ Login student matched')
-      const { username, password } = req.body
+      const { username, password } = body
 
       if (!username || !password) {
         return res.status(400).json({ error: 'Username dan password wajib diisi' })
@@ -160,7 +187,7 @@ export default async function handler(req, res) {
     // POST /api/auth/login/teacher (support both / and -)
     if ((pathname === '/api/auth/login-teacher' || pathname === '/api/auth/login/teacher' || pathname.endsWith('/login/teacher')) && req.method === 'POST') {
       console.log('✅ Login teacher matched')
-      const { email, password } = req.body
+      const { email, password } = body
 
       if (!email || !password) {
         return res.status(400).json({ error: 'Email dan password wajib diisi' })

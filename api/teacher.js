@@ -13,6 +13,24 @@ function verifyTeacher(req) {
   return decoded
 }
 
+// Helper to get request body
+async function getBody(req) {
+  if (req.body) return req.body
+  
+  return new Promise((resolve, reject) => {
+    let data = ''
+    req.on('data', chunk => { data += chunk })
+    req.on('end', () => {
+      try {
+        resolve(data ? JSON.parse(data) : {})
+      } catch (e) {
+        reject(e)
+      }
+    })
+    req.on('error', reject)
+  })
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
@@ -22,6 +40,12 @@ export default async function handler(req, res) {
 
   const { pathname } = new URL(req.url, `http://${req.headers.host}`)
   const pathParts = pathname.split('/').filter(Boolean)
+  
+  // Parse body for POST/PUT requests
+  let body = {}
+  if (req.method === 'POST' || req.method === 'PUT') {
+    body = await getBody(req)
+  }
 
   try {
     verifyTeacher(req)
@@ -55,7 +79,7 @@ export default async function handler(req, res) {
 
     // POST /api/teacher/missions
     if (pathname === '/api/teacher/missions' && req.method === 'POST') {
-      const { title, description, category, difficulty, worldId, xpReward, coinReward, estimatedMinutes, status } = req.body
+      const { title, description, category, difficulty, worldId, xpReward, coinReward, estimatedMinutes, status } = body
 
       if (!title) {
         return res.status(400).json({ error: 'Judul misi wajib diisi' })
@@ -76,7 +100,7 @@ export default async function handler(req, res) {
     // PUT /api/teacher/missions/:id
     if (pathParts[0] === 'api' && pathParts[1] === 'teacher' && pathParts[2] === 'missions' && pathParts[3] && req.method === 'PUT') {
       const id = pathParts[3]
-      const { title, description, category, difficulty, worldId, xpReward, coinReward, estimatedMinutes, status } = req.body
+      const { title, description, category, difficulty, worldId, xpReward, coinReward, estimatedMinutes, status } = body
 
       const existing = await query('SELECT id FROM missions WHERE id = $1', [id])
       if (existing.length === 0) {
@@ -116,7 +140,7 @@ export default async function handler(req, res) {
 
     // POST /api/teacher/case-studies
     if (pathname === '/api/teacher/case-studies' && req.method === 'POST') {
-      const { title, description, category, story, missionsCount, status } = req.body
+      const { title, description, category, story, missionsCount, status } = body
 
       if (!title) {
         return res.status(400).json({ error: 'Judul studi kasus wajib diisi' })
@@ -137,7 +161,7 @@ export default async function handler(req, res) {
     // PUT /api/teacher/case-studies/:id
     if (pathParts[0] === 'api' && pathParts[1] === 'teacher' && pathParts[2] === 'case-studies' && pathParts[3] && req.method === 'PUT') {
       const id = pathParts[3]
-      const { title, description, category, story, missionsCount, status } = req.body
+      const { title, description, category, story, missionsCount, status } = body
 
       const existing = await query('SELECT id FROM case_studies WHERE id = $1', [id])
       if (existing.length === 0) {
@@ -177,7 +201,7 @@ export default async function handler(req, res) {
     // POST /api/teacher/classes
     if (pathname === '/api/teacher/classes' && req.method === 'POST') {
       const decoded = verifyTeacher(req)
-      const { name, grade, teacherName, studentCount } = req.body
+      const { name, grade, teacherName, studentCount } = body
 
       if (!name || !grade) {
         return res.status(400).json({ error: 'Nama dan tingkat kelas wajib diisi' })
@@ -198,7 +222,7 @@ export default async function handler(req, res) {
     // PUT /api/teacher/classes/:id
     if (pathParts[0] === 'api' && pathParts[1] === 'teacher' && pathParts[2] === 'classes' && pathParts[3] && req.method === 'PUT') {
       const id = pathParts[3]
-      const { name, grade, teacherName, studentCount } = req.body
+      const { name, grade, teacherName, studentCount } = body
 
       const existing = await query('SELECT id FROM classes WHERE id = $1', [id])
       if (existing.length === 0) {

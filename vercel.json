@@ -7,29 +7,27 @@
   "installCommand": "npm install",
   "devCommand": "npm run dev",
   
-  "routes": [
-    {
-      "src": "/api/auth/(.*)",
-      "dest": "/api/auth"
-    },
-    {
-      "src": "/api/teacher/(.*)",
-      "dest": "/api/teacher"
-    },
-    {
-      "src": "/api/student/(.*)",
-      "dest": "/api/student"
-    },
-    {
-      "src": "/api/attendance/(.*)",
-      "dest": "/api/attendance"
-    },
-    {
-      "src": "/api",
-      "dest": "/api/index"
-    }
-  ],
   "rewrites": [
+    {
+      "source": "/api/auth/:path*",
+      "destination": "/api/auth"
+    },
+    {
+      "source": "/api/teacher/:path*",
+      "destination": "/api/teacher"
+    },
+    {
+      "source": "/api/student/:path*",
+      "destination": "/api/student"
+    },
+    {
+      "source": "/api/attendance/:path*",
+      "destination": "/api/attendance"
+    },
+    {
+      "source": "/api",
+      "destination": "/api/index"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

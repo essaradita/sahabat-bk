@@ -12,6 +12,24 @@ function verifyTeacher(req) {
   return decoded
 }
 
+// Helper to get request body
+async function getBody(req) {
+  if (req.body) return req.body
+  
+  return new Promise((resolve, reject) => {
+    let data = ''
+    req.on('data', chunk => { data += chunk })
+    req.on('end', () => {
+      try {
+        resolve(data ? JSON.parse(data) : {})
+      } catch (e) {
+        reject(e)
+      }
+    })
+    req.on('error', reject)
+  })
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
@@ -21,6 +39,12 @@ export default async function handler(req, res) {
 
   const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host}`)
   const pathParts = pathname.split('/').filter(Boolean)
+  
+  // Parse body for POST requests
+  let body = {}
+  if (req.method === 'POST') {
+    body = await getBody(req)
+  }
 
   try {
     verifyTeacher(req)
@@ -44,7 +68,7 @@ export default async function handler(req, res) {
 
     // POST /api/teacher/attendance/students
     if (pathname === '/api/teacher/attendance/students' && req.method === 'POST') {
-      const { name, kelas } = req.body
+      const { name, kelas } = body
 
       if (!name || !kelas) {
         return res.status(400).json({ error: 'Nama dan kelas wajib diisi' })
@@ -76,7 +100,7 @@ export default async function handler(req, res) {
 
     // POST /api/teacher/attendance/mark
     if (pathname === '/api/teacher/attendance/mark' && req.method === 'POST') {
-      const { studentId, date, status } = req.body
+      const { studentId, date, status } = body
 
       if (!studentId || !date || !status) {
         return res.status(400).json({ error: 'Student ID, date, dan status wajib diisi' })

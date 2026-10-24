@@ -13,6 +13,24 @@ function verifyStudent(req) {
   return decoded
 }
 
+// Helper to get request body
+async function getBody(req) {
+  if (req.body) return req.body
+  
+  return new Promise((resolve, reject) => {
+    let data = ''
+    req.on('data', chunk => { data += chunk })
+    req.on('end', () => {
+      try {
+        resolve(data ? JSON.parse(data) : {})
+      } catch (e) {
+        reject(e)
+      }
+    })
+    req.on('error', reject)
+  })
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
@@ -21,6 +39,12 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
 
   const { pathname } = new URL(req.url, `http://${req.headers.host}`)
+  
+  // Parse body for POST requests
+  let body = {}
+  if (req.method === 'POST') {
+    body = await getBody(req)
+  }
 
   try {
     const decoded = verifyStudent(req)
@@ -38,7 +62,7 @@ export default async function handler(req, res) {
 
     // POST /api/student/missions/complete
     if (pathname === '/api/student/missions/complete' && req.method === 'POST') {
-      const { missionId, score, xpReward, coinReward } = req.body
+      const { missionId, score, xpReward, coinReward } = body
 
       if (!missionId) {
         return res.status(400).json({ error: 'Mission ID required' })
