@@ -7,67 +7,29 @@
   "installCommand": "npm install",
   "devCommand": "npm run dev",
   
+  "routes": [
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "/api/auth"
+    },
+    {
+      "src": "/api/teacher/(.*)",
+      "dest": "/api/teacher"
+    },
+    {
+      "src": "/api/student/(.*)",
+      "dest": "/api/student"
+    },
+    {
+      "src": "/api/attendance/(.*)",
+      "dest": "/api/attendance"
+    },
+    {
+      "src": "/api",
+      "dest": "/api/index"
+    }
+  ],
   "rewrites": [
-    {
-      "source": "/api/auth/register/student",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/auth/register/teacher",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/auth/login/student",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/auth/login/teacher",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/auth/profile",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/teacher/missions/:id",
-      "destination": "/api/teacher"
-    },
-    {
-      "source": "/api/teacher/case-studies/:id",
-      "destination": "/api/teacher"
-    },
-    {
-      "source": "/api/teacher/classes/:id",
-      "destination": "/api/teacher"
-    },
-    {
-      "source": "/api/teacher/attendance/students/:id",
-      "destination": "/api/attendance"
-    },
-    {
-      "source": "/api/teacher/attendance/:path*",
-      "destination": "/api/attendance"
-    },
-    {
-      "source": "/api/teacher/:path*",
-      "destination": "/api/teacher"
-    },
-    {
-      "source": "/api/student/missions/complete",
-      "destination": "/api/student"
-    },
-    {
-      "source": "/api/student/:path*",
-      "destination": "/api/student"
-    },
-    {
-      "source": "/api/health",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api",
-      "destination": "/api/index"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
