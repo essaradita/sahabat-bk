@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "sahabatbk-frontend",
+  "name": "sahabatbk-fullstack",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
@@ -9,12 +9,33 @@
   
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   
   "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
@@ -44,6 +65,6 @@
   ],
   
   "env": {
-    "VITE_API_URL": "https://sahabatbk-api.onrender.com/api"
+    "NODE_ENV": "production"
   }
 }

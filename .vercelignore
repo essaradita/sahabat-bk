@@ -1,0 +1,67 @@
+# Ignore server folder (old backend)
+server/
+
+# Ignore development files
+*.log
+*.md
+!DEPLOY_VERCEL_FULLSTACK.md
+!API_ENDPOINTS.md
+
+# Ignore documentation files
+BACA_INI_DULU.txt
+CARA_*.txt
+CARA_*.md
+CHANGES_*.md
+CREATOR_*.txt
+DEBUG_*.txt
+DEPLOY_*.txt
+!DEPLOY_VERCEL_FULLSTACK.md
+FIX_*.txt
+FIX_*.md
+FITUR_*.md
+JALANKAN_*.txt
+KEEP_*.md
+LANGKAH_*.md
+MIGRASI_*.md
+NEON_*.md
+PANDUAN_*.txt
+QUICK_*.txt
+README_*.txt
+RESTART_*.md
+SETUP_*.md
+START_*.bat
+STATUS_*.md
+STATUS_*.txt
+TEST_*.md
+TEST_*.bat
+TESTING_*.md
+TROUBLESHOOTING_*.md
+VERIFICATION_*.md
+VERIFIKASI_*.md
+
+# Ignore batch files
+*.bat
+*.ps1
+
+# Ignore railway/render config
+railway.toml
+render.yaml
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore database files
+*.sqlite
+*.db
+
+# Ignore environment files (will be set in Vercel)
+.env
+.env.local
+.env.hp
+.env.production
+
+# Ignore VS Code
+.vscode/
+
+# Keep only essential files for deployment
