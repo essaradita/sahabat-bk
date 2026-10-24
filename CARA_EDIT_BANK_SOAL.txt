@@ -1,0 +1,132 @@
+╔═══════════════════════════════════════════════════════════╗
+║          📝 CARA EDIT BANK SOAL                          ║
+╚═══════════════════════════════════════════════════════════╝
+
+FITUR YANG TERSEDIA:
+✅ Tambah Misi/Studi Kasus Baru
+✅ Edit Misi/Studi Kasus
+✅ Duplikasi (Copy)
+✅ Hapus
+✅ Preview (khusus studi kasus)
+
+═══════════════════════════════════════════════════════════
+BANK SOAL INDIVIDU (MISI)
+═══════════════════════════════════════════════════════════
+
+1. TAMBAH MISI BARU
+   ────────────────
+   - Klik tombol "Misi Baru" (kanan atas)
+   - Isi form: Judul, Deskripsi, Kategori, dll
+   - Klik "Simpan"
+   - Misi akan muncul di list
+
+2. EDIT MISI
+   ─────────
+   - Klik icon pensil (Edit) di kartu misi
+   - Ubah data yang perlu
+   - Klik "Simpan"
+
+3. DUPLIKASI MISI
+   ──────────────
+   - Klik icon copy di kartu misi
+   - Konfirmasi
+   - Misi copy akan muncul di atas dengan "(Copy)"
+   - Edit sesuai kebutuhan
+
+4. HAPUS MISI
+   ──────────
+   - Klik icon tempat sampah (Trash) merah
+   - Konfirmasi
+   - Misi akan dihapus permanent!
+
+═══════════════════════════════════════════════════════════
+BANK SOAL KELOMPOK (STUDI KASUS)
+═══════════════════════════════════════════════════════════
+
+1. TAMBAH STUDI KASUS BARU
+   ───────────────────────
+   - Klik tab "Bank Soal Kelompok"
+   - Klik tombol "Studi Kasus Baru"
+   - Isi form: Judul, Kategori, Deskripsi, Story, dll
+   - Klik "Simpan"
+
+2. EDIT STUDI KASUS
+   ────────────────
+   - Klik icon pensil (Edit) ungu di kartu
+   - Ubah data
+   - Klik "Simpan"
+
+3. PREVIEW STUDI KASUS
+   ───────────────────
+   - Klik icon mata (Eye)
+   - Anda akan masuk sebagai siswa
+   - Lihat tampilan studi kasus
+   - Klik "Keluar" untuk kembali
+
+4. DUPLIKASI
+   ──────────
+   - Klik icon copy
+   - Konfirmasi
+   - Studi kasus copy muncul di atas
+
+5. HAPUS
+   ─────
+   - Klik icon tempat sampah merah
+   - Konfirmasi
+   - Data hilang permanent!
+
+═══════════════════════════════════════════════════════════
+TOMBOL-TOMBOL DI KARTU
+═══════════════════════════════════════════════════════════
+
+✏️  Edit (Pensil)     → Edit data
+📋  Copy              → Duplikasi
+👁️  Eye (Mata)        → Preview (studi kasus saja)
+🗑️  Trash (Merah)     → Hapus permanent
+
+═══════════════════════════════════════════════════════════
+FILTER & SEARCH
+═══════════════════════════════════════════════════════════
+
+Search:
+- Ketik di kolom search
+- Cari berdasarkan judul atau deskripsi
+
+Filter Kategori (Bank Soal Individu):
+- Klik tombol: Semua, Pribadi, Sosial, Belajar, Karier
+- Hanya misi di kategori tersebut yang tampil
+
+═══════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════
+
+Problem: Tombol tidak berfungsi
+Solution:
+- Refresh browser (F5)
+- Clear cache
+- Pastikan backend jalan
+
+Problem: Error saat save/delete
+Solution:
+- Cek console browser (F12)
+- Pastikan backend jalan
+- Restart backend
+
+Problem: Data tidak muncul
+Solution:
+- Refresh halaman
+- Cek koneksi ke backend
+- Lihat console untuk error
+
+═══════════════════════════════════════════════════════════
+TIPS
+═══════════════════════════════════════════════════════════
+
+💡 Gunakan Duplikasi untuk misi yang mirip
+💡 Edit misi draft sebelum mengaktifkan
+💡 Preview studi kasus sebelum diberikan ke siswa
+💡 Backup data dengan export (jika ada fitur)
+
+═══════════════════════════════════════════════════════════
+
+Silakan test semua tombol dan kasih tau kalau ada yang error!

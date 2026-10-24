@@ -1,0 +1,231 @@
+╔═══════════════════════════════════════════════════════════════╗
+║       STATUS PERBAIKAN - ABSENSI & BANK SOAL                  ║
+║                   SIAP UNTUK DI-TEST                          ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📅 Tanggal: 24 Oktober 2026
+✅ Status: SUDAH DIPERBAIKI - PERLU TESTING
+
+═══════════════════════════════════════════════════════════════
+
+🔧 YANG SUDAH DIPERBAIKI:
+
+1. ✅ ABSENSI DIGITAL (Blank Page)
+   - Masalah: Halaman blank putih
+   - Penyebab: Import apiClient dan Loader2 hilang
+   - Solusi: Sudah ditambahkan kembali
+   - File: src/pages/teacher/AttendancePage.jsx
+
+2. ✅ BANK SOAL (Edit/Hapus/Tambah)
+   - Masalah: Fitur tidak berfungsi
+   - Penyebab: Error handling kurang detail
+   - Solusi: Diperbaiki semua handler dengan logging
+   - File: src/pages/teacher/QuestionBank.jsx
+
+═══════════════════════════════════════════════════════════════
+
+📋 CARA TESTING:
+
+LANGKAH 1: RESTART APLIKASI
+---------------------------
+1. Tutup terminal backend dan frontend (kalau masih jalan)
+2. Jalankan START-ALL-HP.bat (atau manual backend + frontend)
+3. Tunggu sampai:
+   ✓ Backend: "Server running on port 3002"
+   ✓ Frontend: "Local: http://localhost:5173"
+
+LANGKAH 2: HARD REFRESH BROWSER
+-------------------------------
+⚠️ PENTING! Jangan skip langkah ini!
+
+Di Laptop:
+  • Tekan Ctrl + Shift + R
+  • Atau Ctrl + F5
+
+Di HP:
+  • Chrome: Buka menu → Settings → Privacy → Clear browsing data
+  • Pilih "Cached images and files" → Clear
+  • Atau force close app dan buka lagi
+
+LANGKAH 3: TEST ABSENSI DIGITAL
+--------------------------------
+1. Login sebagai Guru
+2. Klik menu "Absensi Digital"
+3. Cek kondisi:
+
+   A. Jika BELUM ada data siswa:
+      ✓ Harus muncul pesan "Belum Ada Data Siswa"
+      ✓ Ada tombol "Tambah Siswa Sekarang"
+      ✓ Klik tombol → redirect ke Data Siswa
+
+   B. Jika SUDAH ada data siswa:
+      ✓ Muncul loading spinner dulu
+      ✓ Muncul form absensi dengan pilihan kelas
+      ✓ Muncul daftar siswa dengan status (Hadir/Izin/Sakit/Alpa)
+      ✓ Bisa klik status untuk mengubah
+      ✓ Bisa klik "Simpan Absensi"
+      ✓ Bisa klik "Unduh CSV"
+
+   ❌ Jika masih blank putih:
+      • Buka Developer Console (F12)
+      • Tab Console → screenshot error
+      • Kirim screenshot ke saya
+
+LANGKAH 4: TEST BANK SOAL
+--------------------------
+1. Login sebagai Guru
+2. Klik menu "Bank Soal"
+3. Test fitur berikut:
+
+   Tab BANK SOAL INDIVIDU:
+   ----------------------
+   A. EDIT MISI
+      ✓ Klik icon pensil (Edit) pada misi
+      ✓ Harus masuk ke halaman editor
+      ✓ Bisa edit judul, deskripsi, dll
+      ✓ Klik Simpan
+      ✓ Lihat perubahan di Bank Soal
+
+   B. DUPLIKASI MISI
+      ✓ Klik icon copy (Duplikasi)
+      ✓ Muncul konfirmasi "Duplikasi misi...?"
+      ✓ Klik OK
+      ✓ Muncul alert "✅ Misi berhasil diduplikasi!"
+      ✓ Cek misi baru muncul dengan label "(Copy)"
+
+   C. HAPUS MISI
+      ✓ Klik icon tong sampah (Hapus)
+      ✓ Muncul konfirmasi "Yakin ingin menghapus...?"
+      ✓ Klik OK
+      ✓ Muncul alert "✅ Misi berhasil dihapus!"
+      ✓ Misi hilang dari daftar
+
+   D. TAMBAH MISI BARU
+      ✓ Klik tombol "Misi Baru" (kanan atas)
+      ✓ Masuk ke halaman editor kosong
+      ✓ Isi semua field
+      ✓ Klik Simpan
+      ✓ Redirect ke Bank Soal
+      ✓ Misi baru muncul di daftar
+
+   Tab BANK SOAL KELOMPOK:
+   -----------------------
+   E. EDIT STUDI KASUS
+      ✓ Klik icon pensil (Edit) pada studi kasus
+      ✓ Harus masuk ke halaman editor
+      ✓ Bisa edit judul, deskripsi, dll
+      ✓ Klik Simpan
+
+   F. DUPLIKASI STUDI KASUS
+      ✓ Klik icon copy (Duplikasi)
+      ✓ Muncul konfirmasi
+      ✓ Klik OK
+      ✓ Studi kasus baru muncul
+
+   G. HAPUS STUDI KASUS
+      ✓ Klik icon tong sampah (Hapus)
+      ✓ Muncul konfirmasi
+      ✓ Klik OK
+      ✓ Studi kasus hilang
+
+   H. PREVIEW STUDI KASUS
+      ✓ Klik icon mata (Preview)
+      ✓ Masuk ke tampilan siswa (preview mode)
+
+   ❌ Jika ada error:
+      • Buka Developer Console (F12)
+      • Tab Console → cari error dengan tanda merah
+      • Screenshot dan kirim ke saya
+
+═══════════════════════════════════════════════════════════════
+
+🔍 DEBUGGING TIPS:
+
+Jika masih error, cek hal berikut:
+
+1. BACKEND HARUS JALAN
+   • Cek terminal backend ada tulisan "Server running on port 3002"
+   • Test buka: http://localhost:3002/api/health
+   • Harus muncul: {"status":"OK"}
+
+2. FRONTEND HARUS JALAN
+   • Cek terminal frontend ada tulisan "ready in ... ms"
+   • Browser Console (F12) → tidak ada error merah
+
+3. DATABASE CONNECTION
+   • File database.sqlite harus ada di folder server/
+   • Ukuran file harus > 0 KB (tidak kosong)
+
+4. BROWSER CACHE
+   • Pastikan sudah hard refresh (Ctrl+Shift+R)
+   • Coba buka di Incognito/Private mode
+
+═══════════════════════════════════════════════════════════════
+
+📊 CONSOLE LOG YANG PERLU DICEK:
+
+Saat test Bank Soal, di Console (F12) akan muncul:
+• "Deleting mission: mission-xxx" → saat hapus misi
+• "Duplicating mission: {...}" → saat duplikasi misi
+• "Delete mission error: ..." → jika ada error hapus
+• "Duplicate mission error: ..." → jika ada error duplikasi
+
+Saat test Absensi, di Console akan muncul:
+• "Attendance students loaded: [...]" → saat load siswa
+• "Saving attendance records: [...]" → saat simpan
+• "All attendance saved..." → jika berhasil simpan
+• "Save attendance error: ..." → jika ada error simpan
+
+═══════════════════════════════════════════════════════════════
+
+✅ CHECKLIST SEBELUM LAPOR:
+
+Sebelum lapor masih error, pastikan sudah:
+□ Restart backend dan frontend
+□ Hard refresh browser (Ctrl+Shift+R)
+□ Cek backend jalan di port 3002
+□ Cek frontend jalan di port 5173
+□ Buka Console (F12) untuk cek error
+□ Test di browser lain atau Incognito mode
+
+═══════════════════════════════════════════════════════════════
+
+📝 FORMAT LAPORAN ERROR:
+
+Jika masih error, kirim info berikut:
+1. Fitur apa yang error? (Absensi / Bank Soal / dll)
+2. Langkah apa yang dilakukan sampai error?
+3. Pesan error apa yang muncul? (screenshot)
+4. Console (F12) ada error merah? (screenshot)
+5. Backend dan Frontend sudah jalan? (Ya/Tidak)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 YANG DIHARAPKAN:
+
+1. ABSENSI DIGITAL:
+   ✓ Tidak blank lagi
+   ✓ Bisa input absensi
+   ✓ Bisa simpan absensi
+   ✓ Bisa download CSV
+
+2. BANK SOAL:
+   ✓ Bisa edit misi/studi kasus
+   ✓ Bisa hapus misi/studi kasus
+   ✓ Bisa duplikasi misi/studi kasus
+   ✓ Bisa tambah misi/studi kasus baru
+   ✓ Konfirmasi muncul sebelum hapus
+   ✓ Alert sukses/gagal muncul
+
+═══════════════════════════════════════════════════════════════
+
+📞 NEXT STEPS:
+
+1. Ikuti semua langkah testing di atas
+2. Test satu per satu dengan teliti
+3. Catat yang berhasil dan yang masih error
+4. Kirim laporan lengkap dengan screenshot jika ada error
+
+Good luck! 🚀
+
+═══════════════════════════════════════════════════════════════

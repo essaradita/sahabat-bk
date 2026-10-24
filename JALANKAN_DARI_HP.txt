@@ -1,0 +1,195 @@
+╔═══════════════════════════════════════════════════════════╗
+║        📱 CARA JALANKAN SAHABAT BK DARI HP               ║
+╚═══════════════════════════════════════════════════════════╝
+
+🎯 PILIH SALAH SATU CARA:
+
+═══════════════════════════════════════════════════════════
+CARA 1: PAKAI FILE BATCH (PALING MUDAH)
+═══════════════════════════════════════════════════════════
+
+1. Klik 2x: RUN-BACKEND.bat
+   (Window CMD akan muncul)
+   (JANGAN TUTUP!)
+
+2. Klik 2x: RUN-FRONTEND.bat  
+   (Window CMD akan muncul)
+   (JANGAN TUTUP!)
+
+3. HP Browser → http://192.168.1.10:5174
+
+───────────────────────────────────────────────────────────
+Kalau file .bat langsung tutup sendiri:
+→ Lihat CARA 2 atau CARA 3 di bawah
+───────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════
+CARA 2: PAKAI POWERSHELL (LEBIH STABIL)
+═══════════════════════════════════════════════════════════
+
+1. Klik kanan: start-backend.ps1
+   → Pilih "Run with PowerShell"
+   (Window PowerShell biru akan muncul)
+   (JANGAN TUTUP!)
+
+2. Klik kanan: start-frontend.ps1
+   → Pilih "Run with PowerShell"  
+   (Window PowerShell biru akan muncul)
+   (JANGAN TUTUP!)
+
+3. HP Browser → http://192.168.1.10:5174
+
+───────────────────────────────────────────────────────────
+Kalau muncul error "script disabled":
+1. Buka PowerShell as Administrator
+2. Ketik: Set-ExecutionPolicy RemoteSigned
+3. Ketik: Y (Yes)
+4. Coba lagi
+───────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════
+CARA 3: MANUAL PAKAI CMD (100% PASTI JALAN)
+═══════════════════════════════════════════════════════════
+
+Step 1: Backend
+───────────────
+1. Tekan Windows + R
+2. Ketik: cmd
+3. Enter
+4. Di CMD, ketik (satu per satu, tekan Enter):
+
+   cd "C:\Users\ASUS\SAHABAT BK\server"
+   npm start
+
+5. Tunggu sampai muncul "Server berjalan..."
+6. JANGAN TUTUP window ini!
+
+Step 2: Frontend
+────────────────
+1. Tekan Windows + R lagi
+2. Ketik: cmd
+3. Enter
+4. Di CMD baru, ketik (satu per satu, tekan Enter):
+
+   cd "C:\Users\ASUS\SAHABAT BK"
+   npm run dev:hp
+
+5. Tunggu sampai muncul "Network: http://192.168.1.10:5174"
+6. JANGAN TUTUP window ini!
+
+Step 3: Buka di HP
+──────────────────
+Browser HP → http://192.168.1.10:5174
+
+═══════════════════════════════════════════════════════════
+🧪 TEST DULU (SEBELUM PAKAI HP)
+═══════════════════════════════════════════════════════════
+
+1. Klik: TEST-BATCH.bat
+   → Harus muncul window CMD dengan list files
+   → Kalau langsung tutup = ada masalah di Windows
+
+2. Buka browser PC: http://192.168.1.10:5174
+   → Harus tampil landing page
+   → Kalau tidak = backend/frontend belum jalan
+
+3. Baru coba dari HP
+
+═══════════════════════════════════════════════════════════
+❌ TROUBLESHOOTING
+═══════════════════════════════════════════════════════════
+
+Problem: File .bat langsung tutup
+─────────────────────────────────
+Penyebab:
+- Node.js belum terinstall
+- Folder server tidak ada
+- Path salah
+
+Solusi:
+1. Cek Node.js terinstall:
+   - Buka CMD
+   - Ketik: node --version
+   - Harus muncul versi (contoh: v18.17.0)
+   - Kalau error: Install Node.js dari nodejs.org
+
+2. Cek folder:
+   - Pastikan file .bat ada di folder "SAHABAT BK"
+   - Di dalam harus ada folder "server"
+
+3. Pakai CARA 3 (manual dengan CMD)
+
+Problem: "npm not found"
+────────────────────────
+Solusi:
+1. Install Node.js dari: https://nodejs.org
+2. Restart PC
+3. Coba lagi
+
+Problem: Load Failed di HP
+──────────────────────────
+Solusi:
+1. Cek backend jalan (ada window CMD?)
+2. Cek frontend jalan (ada window CMD?)
+3. PC dan HP WiFi yang SAMA
+4. Coba akses dari PC dulu: http://192.168.1.10:5174
+
+Problem: IP Address salah
+─────────────────────────
+Solusi:
+1. Buka CMD
+2. Ketik: ipconfig
+3. Lihat "IPv4 Address" (contoh: 192.168.1.15)
+4. Edit .env:
+   - Buka dengan Notepad
+   - Ubah: VITE_API_URL=http://192.168.1.15:3002/api
+   - Save
+5. Restart backend & frontend
+
+═══════════════════════════════════════════════════════════
+📋 CHECKLIST
+═══════════════════════════════════════════════════════════
+
+Sebelum mulai:
+□ Node.js terinstall (cek: node --version)
+□ PC dan HP WiFi yang SAMA
+□ IP address benar (cek: ipconfig)
+
+Saat jalan:
+□ Backend window terbuka (Server berjalan...)
+□ Frontend window terbuka (Network: ...)
+□ PC bisa akses http://192.168.1.10:5174
+□ HP bisa akses http://192.168.1.10:5174
+
+═══════════════════════════════════════════════════════════
+🎯 FILES YANG BISA DIPAKAI
+═══════════════════════════════════════════════════════════
+
+Batch Files (Windows CMD):
+✅ RUN-BACKEND.bat        ← Recommended
+✅ RUN-FRONTEND.bat       ← Recommended
+   START-BACKEND-SIMPLE.bat
+   START-FRONTEND-SIMPLE.bat
+   TEST-BATCH.bat         ← Test dulu
+
+PowerShell Scripts:
+✅ start-backend.ps1      ← Kalau .bat tidak jalan
+✅ start-frontend.ps1     ← Kalau .bat tidak jalan
+
+Manual:
+✅ Lihat CARA 3 di atas    ← 100% pasti jalan
+
+═══════════════════════════════════════════════════════════
+💡 TIPS
+═══════════════════════════════════════════════════════════
+
+• Jalankan backend DULU, baru frontend
+• Jangan tutup window CMD/PowerShell
+• Kalau mau stop: tekan Ctrl+C
+• Kalau error: restart backend & frontend
+• Selalu test dari PC dulu sebelum HP
+
+═══════════════════════════════════════════════════════════
+
+🆘 Masih Butuh Bantuan?
+→ Pakai CARA 3 (Manual CMD) - Pasti jalan!

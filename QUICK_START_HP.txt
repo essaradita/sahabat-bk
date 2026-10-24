@@ -1,0 +1,87 @@
+╔═══════════════════════════════════════════════════════════╗
+║         SAHABAT BK - Quick Start untuk HP                 ║
+╚═══════════════════════════════════════════════════════════╝
+
+📋 LANGKAH-LANGKAH:
+
+1. PASTIKAN WiFi SAMA
+   ✓ PC dan HP harus terhubung ke WiFi yang sama
+   ✗ Jangan pakai hotspot HP
+
+2. START BACKEND
+   - Klik 2x: start-backend.bat
+   - Tunggu sampai muncul: "Server berjalan di..."
+   - JANGAN TUTUP window ini!
+
+3. START FRONTEND  
+   - Klik 2x: start-frontend-hp.bat
+   - Tunggu sampai muncul: "Local: ... Network: ..."
+   - JANGAN TUTUP window ini!
+
+4. AKSES DARI HP
+   - Buka browser di HP
+   - Ketik: http://192.168.1.10:5174
+   - Login sebagai Guru atau Siswa
+
+═══════════════════════════════════════════════════════════
+
+⚠️ TROUBLESHOOTING:
+
+Problem: "Load Failed" di HP
+Solution:
+  1. Cek backend jalan (ada window "Server berjalan"?)
+  2. Cek frontend jalan (ada window "Network: ..."?)
+  3. Coba akses dari PC dulu: http://192.168.1.10:5174
+  4. Jika PC bisa, HP tidak: Cek WiFi sama atau tidak
+
+Problem: IP Address berubah
+Solution:
+  1. Buka CMD, ketik: ipconfig
+  2. Cari "IPv4 Address" (contoh: 192.168.1.15)
+  3. Edit file .env, ganti IP lama dengan IP baru:
+     VITE_API_URL=http://192.168.1.15:3002/api
+  4. Restart backend & frontend
+
+Problem: Firewall Block
+Solution:
+  1. Buka "Windows Defender Firewall"
+  2. Click "Allow an app through firewall"
+  3. Cari "Node.js" atau "npm"
+  4. Centang "Public" dan "Private"
+  5. Restart backend & frontend
+
+═══════════════════════════════════════════════════════════
+
+📝 INFO PENTING:
+
+Backend Port:  3002
+Frontend Port: 5174
+IP Address:    192.168.1.10 (bisa berubah!)
+
+URL dari HP:
+- Frontend: http://192.168.1.10:5174
+- Backend:  http://192.168.1.10:3002
+
+URL dari PC:
+- Frontend: http://localhost:5174
+- Backend:  http://localhost:3002
+
+═══════════════════════════════════════════════════════════
+
+✅ CHECKLIST:
+
+[ ] PC dan HP di WiFi yang sama
+[ ] Backend jalan (window terbuka)
+[ ] Frontend jalan (window terbuka)
+[ ] Firewall allow Node.js
+[ ] IP address benar (192.168.1.10)
+[ ] Browser HP bisa buka http://192.168.1.10:5174
+
+═══════════════════════════════════════════════════════════
+
+🆘 MASIH ERROR?
+
+1. Restart PC & HP
+2. Matikan antivirus sementara
+3. Coba browser lain (Chrome/Firefox)
+4. Cek dokumentasi lengkap: CARA_AKSES_DARI_HP.md

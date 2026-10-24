@@ -1,0 +1,230 @@
+╔═══════════════════════════════════════════════════════════════╗
+║           📋 DEPLOYMENT CHECKLIST                             ║
+║        Centang setiap langkah yang sudah selesai              ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Gunakan file ini untuk tracking progress deployment!
+
+═══════════════════════════════════════════════════════════════
+
+🎯 FASE 1: PERSIAPAN
+
+□ Account GitHub sudah ada
+□ Git sudah terinstall
+□ Node.js sudah terinstall
+□ Sistem jalan normal di localhost
+□ Backup database.sqlite
+□ Email siap untuk verifikasi
+
+═══════════════════════════════════════════════════════════════
+
+📦 FASE 2: GIT & GITHUB (5 menit)
+
+□ git init di folder project
+□ git add . (tambahkan semua file)
+□ git commit -m "Initial commit"
+□ Buat repository di github.com
+   Repository name: _________________
+□ git remote add origin [URL]
+□ git push -u origin main
+□ Refresh GitHub → semua file ada
+□ .gitignore working (node_modules tidak ke-upload)
+
+═══════════════════════════════════════════════════════════════
+
+🔧 FASE 3: DEPLOY BACKEND KE RENDER (10 menit)
+
+□ Buka render.com
+□ Sign up with GitHub
+□ Authorize Render
+□ New → Web Service
+□ Connect repository "sahabat-bk"
+□ Configure service:
+   Name: _________________
+   Region: Singapore
+   Runtime: Node
+   Build: npm install
+   Start: npm run start
+   Plan: FREE
+□ Environment Variables:
+   □ NODE_ENV = production
+   □ PORT = 3002
+   □ JWT_SECRET = [32+ karakter random]
+      (Simpan di sini: _____________________________)
+   □ FRONTEND_URL = https://sahabatbk.vercel.app
+□ Add Disk:
+   Name: database-disk
+   Mount: /opt/render/project/src/server
+   Size: 1GB
+□ Create Web Service
+□ Tunggu deploy selesai (~3-5 menit)
+□ Backend URL: _________________
+□ Test /api/health → Status 200 OK
+□ Test / → Muncul info API
+
+═══════════════════════════════════════════════════════════════
+
+🌐 FASE 4: UPDATE API URL (2 menit)
+
+□ Copy Backend URL dari Render
+□ Edit .env.production:
+   VITE_API_URL=[Backend URL]/api
+□ Edit src/lib/api.js:
+   Update logic untuk production
+□ git add .
+□ git commit -m "Update API URL for production"
+□ git push origin main
+□ Tunggu Render auto-deploy (~2 menit)
+
+═══════════════════════════════════════════════════════════════
+
+⚡ FASE 5: DEPLOY FRONTEND KE VERCEL (5 menit)
+
+□ npm install -g vercel
+□ vercel login
+□ Pilih metode login (GitHub)
+□ Browser authorize Vercel
+□ vercel (command pertama)
+   □ Set up project? → Y
+   □ Scope? → Pilih username
+   □ Link existing? → N
+   □ Project name? → sahabatbk (atau bebas)
+   □ Directory? → ./ (Enter)
+   □ Override settings? → N
+□ vercel --prod (deploy production)
+□ Frontend URL: _________________
+□ Test buka di browser → Landing page muncul
+
+═══════════════════════════════════════════════════════════════
+
+🔒 FASE 6: UPDATE CORS (3 menit)
+
+□ Edit server/server.js
+□ Tambah Frontend URL ke CORS origin array
+□ git add server/server.js
+□ git commit -m "Update CORS for Vercel"
+□ git push origin main
+□ Tunggu Render auto-deploy (~2 menit)
+□ Cek Logs di Render → Deploy successful
+
+═══════════════════════════════════════════════════════════════
+
+✅ FASE 7: TESTING PRODUCTION (5 menit)
+
+BASIC TEST:
+□ Buka frontend URL
+□ Landing page muncul dengan benar
+□ Gambar & style loading
+□ Tidak ada error di Console (F12)
+
+LOGIN GURU:
+□ Klik "Guru BK"
+□ Klik "Daftar"
+□ Isi form registrasi
+□ Submit → Auto login
+□ Dashboard guru muncul
+□ Sidebar menu bekerja
+□ Logout berhasil
+
+LOGIN SISWA:
+□ Klik "Siswa"
+□ Klik "Daftar"
+□ Isi form registrasi
+□ Submit → Auto login
+□ Dashboard siswa muncul
+□ Bottom nav bekerja
+□ Logout berhasil
+
+CRUD TEST (sebagai Guru):
+□ Kelola Kelas → Tambah kelas baru
+□ Refresh halaman → Kelas masih ada
+□ Edit kelas → Berhasil
+□ Hapus kelas → Berhasil & permanent
+
+DATABASE PERSISTENCE:
+□ Tambah data baru (misal: kelas)
+□ Tunggu 20 menit (backend sleep)
+□ Akses lagi website
+□ Data masih ada (tidak hilang)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 FASE 8: KEEP-ALIVE (OPTIONAL - 5 menit)
+
+Untuk prevent backend sleep:
+
+□ Buka cron-job.org
+□ Sign up gratis
+□ Create cron job:
+   URL: [Backend URL]/api/health
+   Interval: Every 10 minutes
+□ Execute now (test)
+□ Status 200 OK
+□ Cron aktif
+□ Backend tidak sleep lagi
+
+═══════════════════════════════════════════════════════════════
+
+📊 FASE 9: MONITORING & DOCS
+
+□ Bookmark Render dashboard
+□ Bookmark Vercel dashboard
+□ Simpan credentials:
+   □ GitHub repo URL
+   □ Render service name
+   □ Vercel project name
+   □ JWT_SECRET
+   □ Frontend URL
+   □ Backend URL
+□ Share link ke user/kolega
+□ Buat dokumentasi internal (optional)
+
+═══════════════════════════════════════════════════════════════
+
+🎉 DEPLOYMENT SELESAI!
+
+□ Frontend live & accessible
+□ Backend live & working
+□ Database persistent
+□ CRUD operations working
+□ Login guru & siswa working
+□ HTTPS secure (SSL auto)
+□ Ready for production use
+
+URLS:
+Frontend: _____________________________
+Backend:  _____________________________
+GitHub:   _____________________________
+
+═══════════════════════════════════════════════════════════════
+
+📝 CATATAN PENTING:
+
+Masalah yang ditemukan:
+___________________________________________________________
+___________________________________________________________
+___________________________________________________________
+
+Solusi yang diterapkan:
+___________________________________________________________
+___________________________________________________________
+___________________________________________________________
+
+Tanggal deploy: _____________
+Waktu yang dibutuhkan: _______ menit
+Total biaya: $0/month ✅
+
+═══════════════════════════════════════════════════════════════
+
+🔄 MAINTENANCE CHECKLIST (Bulanan)
+
+□ Cek Render execution hours (< 750 jam/bulan)
+□ Cek Vercel bandwidth usage
+□ Backup database (download dari Render)
+□ Test semua fitur masih jalan
+□ Update dependencies jika ada security patch
+□ Monitor error logs di Render
+
+═══════════════════════════════════════════════════════════════
+
+Selamat! Sistem sudah online! 🚀

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Koneksi API - SAHABAT BK</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .label {
+            font-weight: bold;
+            color: #666;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 Test Koneksi API</h1>
+        <p>Gunakan halaman ini untuk mengecek koneksi ke backend API dari HP</p>
+    </div>
+
+    <div class="card">
+        <h2>Info Perangkat</h2>
+        <span class="label">User Agent:</span>
+        <pre id="userAgent"></pre>
+        <span class="label">Window Location:</span>
+        <pre id="location"></pre>
+    </div>
+
+    <div class="card">
+        <h2>Test Backend API</h2>
+        <button onclick="testBackend()">Test Koneksi Backend</button>
+        <div id="backendStatus"></div>
+        <pre id="backendResponse" style="display:none"></pre>
+    </div>
+
+    <div class="card">
+        <h2>Test Login Guru</h2>
+        <label class="label">Email:</label>
+        <input type="email" id="email" placeholder="guru@example.com" style="width:100%;padding:10px;margin:5px 0;border:1px solid #ddd;border-radius:5px">
+        
+        <label class="label">Password:</label>
+        <input type="password" id="password" placeholder="password123" style="width:100%;padding:10px;margin:5px 0;border:1px solid #ddd;border-radius:5px">
+        
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginStatus"></div>
+        <pre id="loginResponse" style="display:none"></pre>
+    </div>
+
+    <div class="card">
+        <h2>Manual Test URLs</h2>
+        <p>Coba buka URL ini di tab baru:</p>
+        <a href="http://192.168.1.10:3002" target="_blank" style="display:block;margin:5px 0;color:#3b82f6">http://192.168.1.10:3002</a>
+        <a href="http://192.168.1.10:3002/api/auth/profile" target="_blank" style="display:block;margin:5px 0;color:#3b82f6">http://192.168.1.10:3002/api/auth/profile</a>
+        <small style="color:#666">Harus muncul response JSON (bukan "Cannot GET /")</small>
+    </div>
+
+    <script>
+        // Display device info
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('location').textContent = window.location.href;
+
+        const API_URL = 'http://192.168.1.10:3002/api';
+
+        async function testBackend() {
+            const statusDiv = document.getElementById('backendStatus');
+            const responseDiv = document.getElementById('backendResponse');
+            
+            statusDiv.innerHTML = '<div class="status info">⏳ Testing...</div>';
+            responseDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    // Expected: Token tidak ditemukan
+                    statusDiv.innerHTML = '<div class="status success">✅ Backend API Terhubung! (Error 401 = Normal)</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status success">✅ Backend Response: ' + response.status + '</div>';
+                }
+                
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                responseDiv.style.display = 'block';
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Gagal Terhubung: ' + error.message + '</div>';
+                responseDiv.textContent = 'Error Details:\n' + error.stack;
+                responseDiv.style.display = 'block';
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const statusDiv = document.getElementById('loginStatus');
+            const responseDiv = document.getElementById('loginResponse');
+            
+            if (!email || !password) {
+                statusDiv.innerHTML = '<div class="status error">❌ Isi email dan password!</div>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status info">⏳ Login...</div>';
+            responseDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login/teacher`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="status success">✅ Login Berhasil!</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ Login Gagal: ' + data.error + '</div>';
+                }
+                
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                responseDiv.style.display = 'block';
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Error: ' + error.message + '</div>';
+                responseDiv.textContent = 'Error Details:\n' + error.stack;
+                responseDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

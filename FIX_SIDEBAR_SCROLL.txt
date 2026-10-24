@@ -1,0 +1,263 @@
+╔═══════════════════════════════════════════════════════════════╗
+║        ✅ FIXED: SIDEBAR TIDAK IKUT SCROLL LAGI               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📅 Tanggal: 24 Oktober 2026
+🐛 Bug: Sidebar ikut scroll saat scroll konten
+
+═══════════════════════════════════════════════════════════════
+
+🔍 MASALAH:
+
+Ketika scroll halaman "Laporan & Analitik" atau halaman lain:
+❌ Sidebar ikut ke-scroll
+❌ Menu navigasi sidebar ikut menghilang ke atas
+❌ Tombol logout ikut menghilang
+
+Yang seharusnya:
+✅ Sidebar tetap di posisinya (fixed)
+✅ Hanya konten utama yang scroll
+✅ Menu sidebar selalu terlihat
+
+═══════════════════════════════════════════════════════════════
+
+🔎 ROOT CAUSE:
+
+FILE: src/layouts/TeacherLayout.jsx
+
+KODE LAMA (SALAH):
+```jsx
+<aside className={`
+  fixed lg:static inset-y-0 left-0 z-40 w-64
+  ...
+`}>
+```
+
+MASALAH:
+• `lg:static` membuat sidebar jadi static di desktop
+• Static artinya sidebar jadi bagian dari document flow
+• Ketika scroll, sidebar ikut ke-scroll
+
+═══════════════════════════════════════════════════════════════
+
+✅ SOLUSI:
+
+PERUBAHAN 1: SIDEBAR TETAP FIXED
+--------------------------------
+BEFORE:
+```jsx
+<aside className="fixed lg:static ...">
+```
+
+AFTER:
+```jsx
+<aside className="fixed ...">
+```
+
+• Sidebar sekarang `fixed` di semua ukuran layar
+• Tidak ikut scroll
+• Selalu di posisi kiri layar
+
+PERUBAHAN 2: TAMBAH MARGIN KE MAIN CONTENT
+------------------------------------------
+BEFORE:
+```jsx
+<div className="flex-1 flex flex-col min-w-0">
+```
+
+AFTER:
+```jsx
+<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+```
+
+• `lg:ml-64` = margin-left 256px (lebar sidebar)
+• Konten tidak tertutup sidebar
+• Konten dimulai setelah sidebar
+
+PERUBAHAN 3: TAMBAH shrink-0 KE HEADER & FOOTER
+-----------------------------------------------
+BEFORE:
+```jsx
+<div className="p-5 border-b border-blue-700">
+<div className="p-3 border-t border-blue-700">
+```
+
+AFTER:
+```jsx
+<div className="p-5 border-b border-blue-700 shrink-0">
+<div className="p-3 border-t border-blue-700 shrink-0">
+```
+
+• `shrink-0` mencegah header/footer mengecil
+• Header & footer tetap tingginya
+• Hanya bagian nav yang scrollable
+
+═══════════════════════════════════════════════════════════════
+
+📊 STRUKTUR LAYOUT BARU:
+
+┌──────────────────────────────────────────────────────────────┐
+│                                                               │
+│  ┌─────────────┐  ┌────────────────────────────────────┐   │
+│  │             │  │                                     │   │
+│  │  SIDEBAR    │  │        MAIN CONTENT                │   │
+│  │  (FIXED)    │  │        (SCROLLABLE)                │   │
+│  │             │  │                                     │   │
+│  │  [Logo]     │  │  ┌────────────────────────┐        │   │
+│  │  [Profile]  │  │  │ Laporan & Analitik     │        │   │
+│  │             │  │  ├────────────────────────┤        │   │
+│  │  ┌────────┐ │  │  │ Total Siswa: 2         │◄──┐   │   │
+│  │  │ Menu 1 │ │  │  │ Misi Selesai: 0        │   │   │   │
+│  │  │ Menu 2 │ │  │  ├────────────────────────┤   │   │   │
+│  │  │ Menu 3 │ │  │  │ Progress per Bidang    │   │   │   │
+│  │  │ ...    │ │  │  │ - Pribadi: 80%         │   │   │   │
+│  │  └────────┘ │  │  │ - Sosial: 60%          │   │   │   │
+│  │             │  │  ├────────────────────────┤   │   │   │
+│  │  [Logout]   │  │  │ Penyelesaian Misi      │   │   │   │
+│  │  [Credit]   │  │  │ - Test: 50%            │   │   │   │
+│  └─────────────┘  │  │ - Wulandari: 30%       │   │   │   │
+│      ▲            │  ├────────────────────────┤   │   │   │
+│      │            │  │ Detail Misi            │   │   │   │
+│   TIDAK           │  │ ...                    │   │ SCROLL │
+│   SCROLL          │  │ ...                    │   │   │   │
+│                   │  │ ...                    │   │   │   │
+│                   │  └────────────────────────┘   │   │   │
+│                   │                              ◄─┘   │   │
+│                   └────────────────────────────────────┘   │
+│                            margin-left: 256px              │
+└──────────────────────────────────────────────────────────────┘
+
+KETERANGAN:
+• Sidebar: position: fixed (tidak scroll)
+• Main content: margin-left di desktop (tidak tertutup sidebar)
+• Scroll hanya terjadi di area main content
+
+═══════════════════════════════════════════════════════════════
+
+🎯 HASIL SETELAH PERBAIKAN:
+
+DESKTOP (≥1024px):
+✅ Sidebar fixed di kiri (tidak scroll)
+✅ Konten utama punya margin-left agar tidak tertutup
+✅ Scroll hanya terjadi di konten utama
+✅ Menu sidebar selalu terlihat
+✅ Logout & credit selalu di bawah
+
+MOBILE (<1024px):
+✅ Sidebar tersembunyi (transform: translateX(-100%))
+✅ Muncul dengan overlay saat tombol menu diklik
+✅ Konten full width tanpa margin
+✅ Top bar mobile sticky di atas
+
+═══════════════════════════════════════════════════════════════
+
+📋 CARA TEST:
+
+STEP 1: REFRESH BROWSER
+-----------------------
+Tekan: Ctrl + Shift + R
+
+STEP 2: LOGIN GURU
+------------------
+1. Login sebagai Guru BK
+2. Masuk ke Dashboard
+
+STEP 3: TEST SIDEBAR FIXED
+--------------------------
+1. Klik menu "Laporan & Analitik"
+2. Scroll konten ke bawah
+3. ✅ Sidebar TIDAK IKUT SCROLL
+4. ✅ Menu sidebar tetap terlihat
+5. ✅ Tombol "Keluar" tetap di bawah
+6. ✅ Credit pembuat tetap terlihat
+
+STEP 4: TEST DI MENU LAIN
+-------------------------
+1. Coba menu "Data Siswa"
+2. Scroll ke bawah
+3. ✅ Sidebar tetap tidak scroll
+
+4. Coba menu "Bank Soal"
+5. Scroll ke bawah
+6. ✅ Sidebar tetap tidak scroll
+
+STEP 5: TEST RESPONSIVE (Mobile)
+--------------------------------
+1. Resize browser jadi kecil (< 1024px)
+2. ✅ Sidebar tersembunyi
+3. Klik icon menu (☰)
+4. ✅ Sidebar muncul dari kiri dengan overlay
+5. Klik di luar sidebar
+6. ✅ Sidebar tertutup
+
+═══════════════════════════════════════════════════════════════
+
+✅ FILE YANG DIMODIFIKASI:
+
+src/layouts/TeacherLayout.jsx
+
+PERUBAHAN:
+1. ✅ Sidebar: Hapus `lg:static`, jadi `fixed` saja
+2. ✅ Main content: Tambah `lg:ml-64` (margin-left 256px)
+3. ✅ Header sidebar: Tambah `shrink-0`
+4. ✅ Profile section: Tambah `shrink-0`
+5. ✅ Logout section: Tambah `shrink-0`
+
+═══════════════════════════════════════════════════════════════
+
+🎨 CSS CLASSES YANG DIPAKAI:
+
+SIDEBAR:
+• `fixed` - Posisi fixed (tidak scroll)
+• `inset-y-0` - Top: 0, Bottom: 0 (full height)
+• `left-0` - Posisi di kiri
+• `z-40` - Z-index tinggi agar di atas konten
+• `w-64` - Width 256px
+
+MAIN CONTENT:
+• `lg:ml-64` - Margin-left 256px di desktop
+• `overflow-y-auto` - Konten bisa scroll vertikal
+
+SIDEBAR SECTIONS:
+• `shrink-0` - Tidak mengecil (header & footer)
+• `flex-1` - Flexible size (nav area)
+• `overflow-y-auto` - Nav bisa scroll jika terlalu panjang
+
+═══════════════════════════════════════════════════════════════
+
+💡 KENAPA INI PENTING?
+
+SEBELUM FIX:
+❌ User harus scroll ke atas untuk akses menu
+❌ Tidak bisa langsung logout saat di bawah
+❌ UX buruk, tidak standard
+
+SETELAH FIX:
+✅ Menu selalu accessible
+✅ Logout selalu terlihat
+✅ UX standard seperti admin panel modern
+✅ Lebih mudah navigasi
+
+═══════════════════════════════════════════════════════════════
+
+✅ KESIMPULAN:
+
+Sidebar sekarang:
+✅ Fixed di posisi kiri
+✅ TIDAK ikut scroll saat konten di-scroll
+✅ Selalu terlihat di desktop
+✅ Menu & logout selalu accessible
+✅ Responsive untuk mobile
+
+Konten utama:
+✅ Punya margin-left agar tidak tertutup sidebar
+✅ Bisa scroll dengan bebas
+✅ Tidak menggeser sidebar
+
+═══════════════════════════════════════════════════════════════
+
+🚀 SIAP DIGUNAKAN!
+
+Silakan refresh browser (Ctrl+Shift+R) dan test!
+
+═══════════════════════════════════════════════════════════════

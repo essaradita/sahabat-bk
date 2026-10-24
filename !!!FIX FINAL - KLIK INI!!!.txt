@@ -1,0 +1,87 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║            🔥 FIX FINAL - API LOCALHOST 🔥               ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+MASALAH:
+Frontend masih pakai localhost padahal harus 192.168.1.10
+
+SUDAH DIPERBAIKI:
+✅ vite.config.js - Hard-code API URL
+✅ api.js - Default fallback ke 192.168.1.10
+✅ .env.production - File backup
+
+═══════════════════════════════════════════════════════════
+LANGKAH (HANYA 2 KLIK!)
+═══════════════════════════════════════════════════════════
+
+1. KLIK: KILL-ALL-NODE.bat
+   ────────────────────────
+   - Akan stop semua Node.js yang jalan
+   - Tunggu sampai selesai
+   - Tutup window
+
+2. KLIK: START-ALL-HP.bat
+   ──────────────────────
+   - Akan start backend DAN frontend sekaligus
+   - Akan muncul 2 window CMD (jangan tutup!)
+   - Tunggu 10 detik
+
+3. BUKA HP
+   ───────
+   http://192.168.1.10:5173
+   (Perhatikan: port 5173 BUKAN 5174!)
+
+4. CLEAR CACHE HP
+   ──────────────
+   Settings → Privacy → Clear browsing data → Clear
+
+5. LOGIN
+   ─────
+   Sekarang PASTI BISA! ✅
+
+═══════════════════════════════════════════════════════════
+KENAPA HARUS GINI?
+═══════════════════════════════════════════════════════════
+
+Masalah: Vite cache environment variable saat pertama kali start
+Solusi: Hard-code di vite.config.js (ini permanent!)
+
+Sekarang API URL di-set 3 tempat:
+1. vite.config.js (PRIORITY 1) ✅
+2. .env (PRIORITY 2) ✅  
+3. api.js default (PRIORITY 3) ✅
+
+Jadi PASTI pakai 192.168.1.10! 🎯
+
+═══════════════════════════════════════════════════════════
+CEK DI BROWSER HP
+═══════════════════════════════════════════════════════════
+
+Setelah start, buka console browser (F12):
+Harus muncul:
+🌐 API URL: http://192.168.1.10:3002/api ✅
+
+Kalau masih localhost = ada yang salah (kasih tau!)
+
+═══════════════════════════════════════════════════════════
+PORT YANG BENAR
+═══════════════════════════════════════════════════════════
+
+Backend:  http://192.168.1.10:3002
+Frontend: http://192.168.1.10:5173  ← Pakai ini!
+
+(Bukan 5174!)
+
+═══════════════════════════════════════════════════════════
+
+🎯 INTINYA:
+
+1. KILL-ALL-NODE.bat (stop semua)
+2. START-ALL-HP.bat (start backend + frontend)
+3. HP → http://192.168.1.10:5173
+4. Clear cache HP
+5. LOGIN PASTI BISA! 🎉
+
+═══════════════════════════════════════════════════════════

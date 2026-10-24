@@ -1,0 +1,71 @@
+╔═══════════════════════════════════════════════════════════╗
+║         CARA AKSES APLIKASI DARI HP                       ║
+╚═══════════════════════════════════════════════════════════╝
+
+📱 LANGKAH-LANGKAH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  PASTIKAN HP DAN LAPTOP TERHUBUNG KE WIFI YANG SAMA
+   ✅ HP: Konek ke WiFi (misal: WiFi-Rumah)
+   ✅ Laptop: Konek ke WiFi yang sama (WiFi-Rumah)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2️⃣  JALANKAN APLIKASI DI LAPTOP
+
+   A. Jalankan Backend:
+      - Double-click: start-backend.bat
+      - Tunggu muncul: "Server berjalan di..."
+
+   B. Jalankan Frontend:
+      - Double-click: start-frontend.bat
+      - Tunggu muncul: "Local: http://..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3️⃣  BUKA DI HP
+
+   Buka browser di HP (Chrome/Safari), ketik:
+
+   📱 http://192.168.1.10:5173
+
+   ✅ Aplikasi akan muncul di HP!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 TIPS
+
+- Simpan link di bookmark HP biar ga perlu ketik lagi
+- Laptop harus tetap nyala dan aplikasi harus tetap jalan
+- Kalau IP berubah (misal: ganti WiFi), cek IP baru:
+  Command: ipconfig | findstr "IPv4"
+  Lalu ganti 192.168.1.10 dengan IP yang baru
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ TROUBLESHOOTING
+
+Problem: HP tidak bisa akses
+Solusi:
+  1. Cek HP dan laptop konek ke WiFi yang sama
+  2. Cek firewall Windows (allow port 3002 & 5173)
+  3. Restart backend dan frontend
+  4. Pastikan antivirus tidak block koneksi
+
+Problem: "Connection refused"
+Solusi:
+  1. Pastikan backend & frontend masih jalan di laptop
+  2. Cek IP address masih sama (ipconfig)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 CATATAN PENTING
+
+✅ Laptop HARUS TETAP NYALA
+✅ Backend & Frontend HARUS TETAP JALAN
+✅ WiFi HARUS SAMA antara HP dan Laptop
+✅ Data tersimpan di laptop (database.sqlite)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Happy Coding! 🚀

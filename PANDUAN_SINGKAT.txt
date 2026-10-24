@@ -1,0 +1,149 @@
+╔══════════════════════════════════════════════════════╗
+║          🚀 SAHABAT BK - PANDUAN CEPAT              ║
+╚══════════════════════════════════════════════════════╝
+
+📱 AKSES DARI HP (3 LANGKAH MUDAH):
+
+┌──────────────────────────────────────────────────────┐
+│ STEP 1: JALANKAN BACKEND                             │
+└──────────────────────────────────────────────────────┘
+
+   Klik 2x file ini: START-BACKEND-SIMPLE.bat
+   
+   Akan muncul window CMD hitam:
+   ┌────────────────────────────────────┐
+   │ 🚀 Server berjalan di              │
+   │ http://localhost:3002              │
+   │ ✅ Siap digunakan!                  │
+   └────────────────────────────────────┘
+   
+   ⚠️ JANGAN TUTUP window ini!
+
+┌──────────────────────────────────────────────────────┐
+│ STEP 2: JALANKAN FRONTEND                            │
+└──────────────────────────────────────────────────────┘
+
+   Klik 2x file ini: START-FRONTEND-SIMPLE.bat
+   
+   Akan muncul window CMD:
+   ┌────────────────────────────────────┐
+   │ VITE ready in 500ms                │
+   │                                    │
+   │ ➜ Local:   http://localhost:5174  │
+   │ ➜ Network: http://192.168.1.10:5174│
+   └────────────────────────────────────┘
+   
+   ⚠️ JANGAN TUTUP window ini!
+   ⚠️ Catat IP Network (192.168.1.10)
+
+┌──────────────────────────────────────────────────────┐
+│ STEP 3: BUKA DI HP                                   │
+└──────────────────────────────────────────────────────┘
+
+   1. Pastikan HP di WiFi yang SAMA dengan PC
+   2. Buka Chrome/Firefox di HP
+   3. Ketik: http://192.168.1.10:5174
+   4. Selesai! Bisa login 🎉
+
+═══════════════════════════════════════════════════════
+
+❌ MASALAH: File BAT tidak bisa diklik?
+
+SOLUSI: Jalankan Manual
+
+1. Klik Start → Ketik "cmd" → Enter
+
+2. Di CMD, ketik (satu per satu):
+   
+   cd c:\Users\ASUS\SAHABAT BK\server
+   npm start
+
+3. Buka CMD BARU (jangan tutup yang lama!)
+   Klik Start → Ketik "cmd" → Enter
+
+4. Di CMD baru, ketik:
+   
+   cd c:\Users\ASUS\SAHABAT BK
+   npm run dev:hp
+
+═══════════════════════════════════════════════════════
+
+❌ MASALAH: "Load Failed" di HP?
+
+CEK LIST:
+□ Backend jalan? (ada window CMD "Server berjalan...")
+□ Frontend jalan? (ada window CMD "Local:... Network:...")
+□ PC dan HP WiFi sama?
+□ IP benar? (lihat di window CMD "Network: ...")
+
+SOLUSI:
+- Restart backend & frontend
+- Matikan antivirus
+- Cek Windows Firewall (allow Node.js)
+
+═══════════════════════════════════════════════════════
+
+❌ MASALAH: IP Address berubah?
+
+Jika IP berubah dari 192.168.1.10 ke yang lain:
+
+1. Cek IP baru:
+   - Buka CMD
+   - Ketik: ipconfig
+   - Lihat "IPv4 Address" (contoh: 192.168.1.15)
+
+2. Update .env:
+   - Buka file .env dengan Notepad
+   - Cari baris: VITE_API_URL=http://192.168.1.10:3002/api
+   - Ganti IP: VITE_API_URL=http://192.168.1.15:3002/api
+   - Save (Ctrl+S)
+
+3. Restart:
+   - Tutup semua window CMD
+   - Jalankan ulang Step 1 & 2
+
+═══════════════════════════════════════════════════════
+
+✅ TEST KONEKSI:
+
+Dari PC browser, buka:
+http://192.168.1.10:5174
+→ Harus tampil landing page
+
+Dari HP browser, buka:
+http://192.168.1.10:5174
+→ Harus tampil landing page
+
+Jika PC bisa tapi HP tidak:
+→ Masalah di WiFi atau Firewall
+
+═══════════════════════════════════════════════════════
+
+📞 INFO TEKNIS:
+
+Backend Port:  3002
+Frontend Port: 5174 (atau 5173)
+Database:      SQLite (server/database.sqlite)
+
+Default IP:    192.168.1.10
+(IP bisa berubah, cek dengan "ipconfig")
+
+═══════════════════════════════════════════════════════
+
+💡 TIPS:
+
+1. Jalankan backend DULU, baru frontend
+2. Jangan tutup window CMD
+3. Kalau mau stop, tekan Ctrl+C di CMD
+4. Kalau error, restart backend & frontend
+
+═══════════════════════════════════════════════════════
+
+🆘 MASIH BUTUH BANTUAN?
+
+Lihat file:
+- BACA_INI_DULU.txt (panduan detail)
+- CARA_AKSES_DARI_HP.md (troubleshooting lengkap)
+- QUICK_START_HP.txt (checklist)
+
+Atau jalankan manual dengan CMD (lihat atas)

@@ -1,0 +1,318 @@
+╔═══════════════════════════════════════════════════════════════╗
+║       🌐 SAHABAT BK - DEPLOY ONLINE 100% GRATIS               ║
+║          Panduan Lengkap Siap Deploy!                         ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📅 Tanggal: 24 Oktober 2026
+✅ Status: SIAP DEPLOY
+💰 Biaya: $0/bulan (GRATIS SELAMANYA)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 ARSITEKTUR DEPLOYMENT:
+
+┌─────────────────────────────────────────────────────────────┐
+│                                                              │
+│  USER (Guru/Siswa)                                          │
+│       ↓                                                      │
+│       ↓ https://sahabatbk.vercel.app                       │
+│       ↓                                                      │
+│  ┌──────────────────────────┐                              │
+│  │  VERCEL (Frontend)       │                              │
+│  │  • React + Vite          │  🆓 100% FREE                │
+│  │  • Static files          │  ✅ Unlimited bandwidth      │
+│  │  • Global CDN            │  ✅ Auto SSL (HTTPS)         │
+│  │  • No sleep              │  ✅ Fast deploy (1-2 min)    │
+│  └──────────┬───────────────┘                              │
+│             │ API Calls                                     │
+│             ↓                                                │
+│  ┌──────────────────────────┐                              │
+│  │  RENDER (Backend)        │                              │
+│  │  • Node.js + Express     │  🆓 100% FREE                │
+│  │  • SQLite database       │  ⚠️  Sleep 15 min idle       │
+│  │  • Persistent disk 1GB   │  ✅ Auto SSL (HTTPS)         │
+│  │  • 512MB RAM, 0.1 CPU    │  ✅ Auto deploy GitHub       │
+│  └──────────────────────────┘                              │
+│                                                              │
+│  OPTIONAL: Cron-job.org (Keep-Alive)                        │
+│  • Ping every 10 minutes     🆓 FREE                        │
+│  • Prevent backend sleep     ✅ Better UX                   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+📁 FILE DEPLOYMENT YANG SUDAH DISIAPKAN:
+
+✅ .gitignore               → Apa yang tidak boleh di-commit
+✅ .env.production          → Environment variables production
+✅ render.yaml              → Config Render backend
+✅ vercel.json              → Config Vercel frontend
+✅ package.json             → Update scripts production
+✅ DEPLOY_GUIDE.md          → Panduan lengkap step by step
+✅ QUICK_DEPLOY.txt         → Quick start ringkas
+✅ KEEP_ALIVE_CRON.md       → Setup cron ping (optional)
+
+═══════════════════════════════════════════════════════════════
+
+🚀 CARA DEPLOY (RINGKAS):
+
+Ikuti 6 langkah mudah:
+
+1️⃣  PUSH KE GITHUB (5 menit)
+    • git init
+    • git add .
+    • git commit -m "Initial commit"
+    • Buat repo di GitHub
+    • git push
+
+2️⃣  DEPLOY BACKEND KE RENDER (10 menit)
+    • Buat account render.com (gratis)
+    • Connect GitHub repo
+    • Set environment variables
+    • Add persistent disk untuk database
+    • Deploy!
+
+3️⃣  UPDATE API URL (2 menit)
+    • Edit .env.production
+    • Edit src/lib/api.js
+    • Commit & push
+
+4️⃣  DEPLOY FRONTEND KE VERCEL (5 menit)
+    • npm install -g vercel
+    • vercel login
+    • vercel --prod
+
+5️⃣  UPDATE CORS (3 menit)
+    • Tambah Vercel URL ke CORS
+    • Commit & push
+    • Render auto-deploy
+
+6️⃣  TEST PRODUCTION (5 menit)
+    • Buka website
+    • Test login
+    • Test CRUD
+    • Done! 🎉
+
+═══════════════════════════════════════════════════════════════
+
+📚 PILIH PANDUAN:
+
+┌─────────────────────────────────────────────────────────────┐
+│  🎯 PEMULA? Baca yang ini dulu:                             │
+│                                                              │
+│  → QUICK_DEPLOY.txt                                         │
+│     Quick start untuk yang mau cepat                        │
+│     Langkah-langkah ringkas tanpa detail panjang            │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  📖 MAU DETAIL LENGKAP? Baca ini:                           │
+│                                                              │
+│  → DEPLOY_GUIDE.md                                          │
+│     Panduan lengkap step by step                            │
+│     Penjelasan setiap langkah                               │
+│     Troubleshooting lengkap                                 │
+│     Screenshot & contoh                                     │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ⚡ MAU BACKEND TIDAK SLEEP? (Optional)                     │
+│                                                              │
+│  → KEEP_ALIVE_CRON.md                                       │
+│     Setup cron ping gratis                                  │
+│     Backend jalan 24/7 tanpa sleep                          │
+│     UX seperti server berbayar                              │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+💰 TOTAL BIAYA:
+
+┌───────────────────────────────────────────────────────────┐
+│  GRATIS SELAMANYA! $0/month                               │
+├───────────────────────────────────────────────────────────┤
+│  ✅ Render Backend:    FREE (750 jam/bulan)              │
+│  ✅ Vercel Frontend:   FREE (unlimited)                   │
+│  ✅ Cron-job:          FREE (optional)                    │
+│  ✅ GitHub:            FREE                               │
+│  ✅ Domain:            FREE (.onrender.com, .vercel.app)  │
+│  ✅ SSL/HTTPS:         FREE (auto)                        │
+├───────────────────────────────────────────────────────────┤
+│  Total:                $0/month 🎊                        │
+└───────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+⏱️  ESTIMASI WAKTU:
+
+Pertama kali deploy:    20-30 menit
+Update aplikasi:        5-10 menit
+Setup cron (optional):  5 menit
+
+═══════════════════════════════════════════════════════════════
+
+✅ KEUNTUNGAN DEPLOY ONLINE:
+
+1. ✅ Akses dari mana saja (tidak perlu laptop)
+2. ✅ Akses dari HP/tablet
+3. ✅ Bisa dipakai banyak user sekaligus
+4. ✅ Data tersimpan di cloud (aman)
+5. ✅ Auto backup oleh Render
+6. ✅ HTTPS secure (SSL gratis)
+7. ✅ Professional URL
+8. ✅ Share link ke guru/siswa lain
+9. ✅ Tidak perlu install apa-apa
+10. ✅ Auto update saat push ke GitHub
+
+═══════════════════════════════════════════════════════════════
+
+🎯 URL SETELAH DEPLOY:
+
+Frontend (User akses):
+→ https://sahabatbk.vercel.app
+   atau
+→ https://[nama-project].vercel.app
+
+Backend (API):
+→ https://sahabatbk-api.onrender.com
+   atau
+→ https://[nama-service].onrender.com
+
+Health Check:
+→ https://[backend-url]/api/health
+
+═══════════════════════════════════════════════════════════════
+
+⚠️  HAL PENTING:
+
+SEBELUM DEPLOY:
+□ Backup database.sqlite
+□ Test sistem di localhost dulu
+□ Pastikan tidak ada error
+□ Siapkan email untuk verifikasi
+
+SAAT DEPLOY:
+□ Ikuti panduan step by step
+□ Jangan skip langkah
+□ Screenshot setiap step (untuk referensi)
+□ Simpan JWT_SECRET di tempat aman
+
+SETELAH DEPLOY:
+□ Test semua fitur online
+□ Test dari laptop & HP
+□ Share URL ke user
+□ Setup cron ping (recommended)
+
+═══════════════════════════════════════════════════════════════
+
+🔒 KEAMANAN:
+
+✅ HTTPS dengan SSL gratis (auto)
+✅ Password di-hash dengan bcrypt
+✅ JWT token untuk authentication
+✅ CORS protection
+✅ Environment variables secure
+✅ Database tidak bisa diakses public
+✅ API endpoint ter-protect dengan auth
+
+═══════════════════════════════════════════════════════════════
+
+📊 MONITORING & MAINTENANCE:
+
+Render Dashboard:
+→ https://dashboard.render.com
+   • Lihat logs backend
+   • Monitor CPU & RAM usage
+   • Lihat execution hours
+   • Restart service jika perlu
+
+Vercel Dashboard:
+→ https://vercel.com/dashboard
+   • Lihat analytics
+   • Monitor bandwidth usage
+   • Deploy history
+   • Custom domain (optional)
+
+═══════════════════════════════════════════════════════════════
+
+🔄 WORKFLOW UPDATE:
+
+Jika ada perubahan kode:
+
+1. Edit code di local
+2. Test di localhost
+3. git add .
+4. git commit -m "Deskripsi perubahan"
+5. git push origin main
+
+Auto-deploy:
+• Render: Auto dalam 2-3 menit
+• Vercel: Manual dengan `vercel --prod`
+
+═══════════════════════════════════════════════════════════════
+
+❓ FAQ:
+
+Q: Apakah benar 100% gratis?
+A: Ya! Render dan Vercel free tier cukup untuk small-medium app
+
+Q: Data aman tidak?
+A: Sangat aman. Database persistent, auto backup, HTTPS secure
+
+Q: Berapa lama backend sleep?
+A: 15 menit tidak ada request. First request wake-up 30-60 detik
+
+Q: Bisa dipakai ramai-ramai?
+A: Ya! Free tier cukup untuk 100-200 concurrent users
+
+Q: Bisa custom domain?
+A: Bisa! Gratis di Vercel. Perlu beli domain dulu (~$10/tahun)
+
+Q: Kalau mau upgrade ke berbayar?
+A: Render: $7/month (no sleep, more resources)
+   Vercel: Tetap gratis untuk frontend
+
+═══════════════════════════════════════════════════════════════
+
+📞 TROUBLESHOOTING:
+
+Kalau ada masalah saat deploy:
+
+1. Baca DEPLOY_GUIDE.md bagian Troubleshooting
+2. Cek Logs di Render dashboard
+3. Cek Console browser (F12)
+4. Screenshot error message
+5. Google error message + "render.com" atau "vercel"
+
+Common errors & solusi ada di DEPLOY_GUIDE.md!
+
+═══════════════════════════════════════════════════════════════
+
+🎉 SIAP DEPLOY?
+
+Pilih satu:
+
+1. 🎯 QUICK START (20 menit)
+   → Baca: QUICK_DEPLOY.txt
+   → Langsung action!
+
+2. 📖 DETAIL LENGKAP (30 menit)
+   → Baca: DEPLOY_GUIDE.md
+   → Pahami setiap step
+
+Keduanya menghasilkan hasil yang sama!
+Pilih sesuai gaya belajar Anda.
+
+═══════════════════════════════════════════════════════════════
+
+🚀 GOOD LUCK!
+
+Sistem SAHABAT BK siap go online!
+
+Dikembangkan oleh: Kartika Wulandari, S.Sos.
+
+═══════════════════════════════════════════════════════════════

@@ -1,0 +1,95 @@
+╔═══════════════════════════════════════════════════════════════╗
+║     ✅ SUDAH DIPERBAIKI: HAPUS KELAS SEKARANG PERMANEN        ║
+╚═══════════════════════════════════════════════════════════════╝
+
+🐛 Bug: Kelas 8B dihapus tapi muncul lagi setelah refresh
+✅ Fix: Sekarang hapus kelas langsung tersimpan ke database
+
+═══════════════════════════════════════════════════════════════
+
+⚡ CARA TEST (3 LANGKAH):
+
+┌─────────────────────────────────────────────────────────────┐
+│  1️⃣  RESTART BACKEND (WAJIB!)                                │
+│                                                              │
+│     Tutup terminal backend                                   │
+│     Klik 2x: START-ALL-HP.bat                               │
+│     Tunggu muncul: "Server berjalan di http://..."         │
+│                                                              │
+│     ⚠️ Database schema sudah diupdate!                      │
+│        Backend HARUS direstart untuk buat table baru        │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  2️⃣  HARD REFRESH BROWSER                                    │
+│                                                              │
+│     Tekan: Ctrl + Shift + R                                 │
+│     (atau Ctrl + F5)                                        │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  3️⃣  TEST HAPUS KELAS                                        │
+│                                                              │
+│     1. Login Guru                                            │
+│     2. Klik "Kelola Kelas"                                  │
+│     3. Klik icon sampah 🗑️ pada Kelas 8B                    │
+│     4. Klik "Hapus" di dialog konfirmasi                    │
+│     5. ✅ Kelas 8B hilang                                    │
+│     6. REFRESH halaman (F5)                                 │
+│     7. ✅ Kelas 8B TETAP TIDAK ADA                          │
+│                                                              │
+│     Jika masih muncul → lihat panduan lengkap di bawah      │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+✅ YANG SUDAH DIPERBAIKI:
+
+1. ✅ Tambah table 'classes' di database SQLite
+2. ✅ Tambah API endpoints di backend:
+   • GET    /api/teacher/classes
+   • POST   /api/teacher/classes
+   • PUT    /api/teacher/classes/:id
+   • DELETE /api/teacher/classes/:id
+
+3. ✅ Update frontend untuk pakai API database
+4. ✅ Hapus kelas sekarang permanen tersimpan
+5. ✅ Tambah/Edit kelas juga tersimpan permanen
+6. ✅ Loading state saat ambil data
+7. ✅ Error handling lengkap
+
+═══════════════════════════════════════════════════════════════
+
+🎯 HASIL YANG DIHARAPAKAN:
+
+SETELAH FIX:
+✅ Hapus Kelas 8B → hilang dari tampilan
+✅ Refresh halaman → Kelas 8B TETAP TIDAK ADA
+✅ Restart aplikasi → Kelas 8B TETAP TIDAK ADA
+✅ Semua perubahan permanen tersimpan di database
+
+═══════════════════════════════════════════════════════════════
+
+❌ JIKA MASIH MUNCUL LAGI:
+
+1. Backend belum direstart? → Restart dengan START-ALL-HP.bat
+2. Browser belum hard refresh? → Ctrl + Shift + R
+3. Masih error? → Buka Console (F12) dan screenshot error
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOKUMENTASI LENGKAP:
+
+Baca detail di:
+→ FIX_KELOLA_KELAS_HAPUS.txt (panduan lengkap)
+
+═══════════════════════════════════════════════════════════════
+
+🚀 MULAI SEKARANG:
+
+1. Restart backend (START-ALL-HP.bat)
+2. Hard refresh browser (Ctrl+Shift+R)
+3. Test hapus kelas
+4. Lapor hasilnya!
+
+═══════════════════════════════════════════════════════════════

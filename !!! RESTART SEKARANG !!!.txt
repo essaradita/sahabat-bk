@@ -1,0 +1,88 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║        ⚡ PERBAIKAN: AUTO-DETECT LAPTOP/HP ⚡             ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+MASALAH:
+✅ HP bisa login (pakai IP 192.168.1.10)
+❌ Laptop tidak bisa (butuh localhost)
+
+SOLUSI:
+Frontend sekarang OTOMATIS detect:
+- Dari Laptop → Pakai http://localhost:3002
+- Dari HP     → Pakai http://192.168.1.10:3002
+
+═══════════════════════════════════════════════════════════
+RESTART FRONTEND (WAJIB!)
+═══════════════════════════════════════════════════════════
+
+1. STOP FRONTEND
+   ─────────────
+   - Cari window CMD frontend
+   - Tekan Ctrl+C
+   - Ketik: Y
+
+2. START LAGI
+   ──────────
+   Klik 2x: RUN-FRONTEND.bat
+   
+   Atau manual:
+   npm run dev:hp
+
+3. TUNGGU SAMPAI MUNCUL
+   ────────────────────
+   ➜ Local:   http://localhost:5173
+   ➜ Network: http://192.168.1.10:5173
+
+4. TEST
+   ────
+   Laptop: http://localhost:5173
+   HP:     http://192.168.1.10:5173
+
+═══════════════════════════════════════════════════════════
+CARA KERJA AUTO-DETECT
+═══════════════════════════════════════════════════════════
+
+Frontend cek hostname:
+- localhost     → Backend: http://localhost:3002 ✅
+- 127.0.0.1     → Backend: http://localhost:3002 ✅
+- 192.168.1.10  → Backend: http://192.168.1.10:3002 ✅
+
+Jadi OTOMATIS sesuai device! 🎯
+
+═══════════════════════════════════════════════════════════
+CEK DI CONSOLE
+═══════════════════════════════════════════════════════════
+
+Buka F12 → Console, harus muncul:
+
+Laptop:
+🌐 Hostname: localhost
+🌐 Using: LOCALHOST
+🌐 API URL: http://localhost:3002/api ✅
+
+HP:
+🌐 Hostname: 192.168.1.10
+🌐 Using: NETWORK IP
+🌐 API URL: http://192.168.1.10:3002/api ✅
+
+═══════════════════════════════════════════════════════════
+VERIFIKASI
+═══════════════════════════════════════════════════════════
+
+✅ Laptop login: HARUS BISA
+✅ HP login:     HARUS BISA
+✅ Preview mode: HARUS BISA
+✅ Bank Soal:    HARUS BISA
+
+═══════════════════════════════════════════════════════════
+
+🎯 INTINYA:
+
+1. Ctrl+C di frontend
+2. RUN-FRONTEND.bat (start lagi)
+3. Test laptop & HP
+4. Sekarang KEDUA-DUANYA BISA! ✅
+
+═══════════════════════════════════════════════════════════

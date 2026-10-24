@@ -1,0 +1,87 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║           🚀 SAHABAT BK - MULAI DISINI! 🚀               ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+
+📱 CARA TERCEPAT (2 Klik):
+
+   1. Klik 2x: RUN-BACKEND.bat     ← JANGAN TUTUP!
+   2. Klik 2x: RUN-FRONTEND.bat    ← JANGAN TUTUP!
+   3. HP Browser → http://192.168.1.10:5174
+
+
+═══════════════════════════════════════════════════════════
+
+⚠️  KALAU FILE .BAT LANGSUNG TUTUP:
+
+   Pakai PowerShell:
+   
+   1. Klik kanan: start-backend.ps1
+      → Pilih "Run with PowerShell"
+      → JANGAN TUTUP!
+
+   2. Klik kanan: start-frontend.ps1
+      → Pilih "Run with PowerShell"
+      → JANGAN TUTUP!
+
+   3. HP Browser → http://192.168.1.10:5174
+
+═══════════════════════════════════════════════════════════
+
+⚠️  KALAU MASIH TIDAK BISA:
+
+   Lihat file: JALANKAN_DARI_HP.txt
+   
+   Ada 3 cara lengkap termasuk cara manual dengan CMD
+   yang 100% pasti jalan!
+
+═══════════════════════════════════════════════════════════
+
+🧪 TEST DULU (Sebelum pakai HP):
+
+   1. Klik: TEST-BATCH.bat
+      → Harus muncul CMD dengan list files
+      → Kalau langsung tutup = lihat JALANKAN_DARI_HP.txt
+
+   2. Browser PC: http://192.168.1.10:5174
+      → Harus tampil landing page
+
+   3. Baru coba dari HP
+
+═══════════════════════════════════════════════════════════
+
+✅ CHECKLIST:
+
+   □ Node.js terinstall? (Buka CMD → ketik: node --version)
+   □ PC dan HP WiFi SAMA?
+   □ Backend jalan? (Ada window CMD terbuka?)
+   □ Frontend jalan? (Ada window CMD terbuka?)
+
+═══════════════════════════════════════════════════════════
+
+📚 DOKUMENTASI LENGKAP:
+
+   JALANKAN_DARI_HP.txt      ← Panduan Lengkap
+   PANDUAN_SINGKAT.txt       ← Quick Guide
+   CARA_AKSES_DARI_HP.md     ← Troubleshooting Detail
+
+═══════════════════════════════════════════════════════════
+
+🎯 INTINYA:
+
+   1. Backend harus jalan (window CMD terbuka)
+   2. Frontend harus jalan (window CMD terbuka)
+   3. HP dan PC WiFi yang SAMA
+   4. Akses: http://192.168.1.10:5174
+
+═══════════════════════════════════════════════════════════
+
+💡 Kalau IP berubah:
+   - Cek: ipconfig di CMD
+   - Update: .env file
+   - Restart backend & frontend
+
+🆘 Butuh bantuan:
+   - Baca: JALANKAN_DARI_HP.txt (CARA 3 - Manual CMD)

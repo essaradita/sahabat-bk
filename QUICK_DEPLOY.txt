@@ -1,0 +1,187 @@
+╔═══════════════════════════════════════════════════════════════╗
+║          🚀 QUICK DEPLOY GUIDE - SAHABAT BK                   ║
+║              Backend (Render) + Frontend (Vercel)             ║
+║                    100% GRATIS                                ║
+╚═══════════════════════════════════════════════════════════════╝
+
+⏱️  Estimasi waktu: 20-30 menit (pertama kali)
+💰 Total biaya: $0/bulan
+
+═══════════════════════════════════════════════════════════════
+
+📋 CHECKLIST PERSIAPAN:
+
+□ Account GitHub (sudah ada ✅)
+□ Git sudah terinstall
+□ Node.js sudah terinstall
+□ System jalan di localhost
+□ Email untuk verifikasi
+
+═══════════════════════════════════════════════════════════════
+
+🎯 LANGKAH CEPAT:
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 1: PUSH KE GITHUB (5 menit)                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Buka terminal di folder project                         │
+│  2. git init                                                │
+│  3. git add .                                               │
+│  4. git commit -m "Initial commit"                          │
+│  5. Buat repo di github.com/new                             │
+│  6. git remote add origin https://github.com/USER/repo.git  │
+│  7. git push -u origin main                                 │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 2: DEPLOY BACKEND KE RENDER (10 menit)                │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Buka render.com → Sign up with GitHub                   │
+│  2. New → Web Service                                       │
+│  3. Connect repository "sahabat-bk"                         │
+│  4. Settings:                                               │
+│     - Name: sahabatbk-api                                   │
+│     - Region: Singapore                                     │
+│     - Runtime: Node                                         │
+│     - Build: npm install                                    │
+│     - Start: npm run start                                  │
+│     - Plan: FREE                                            │
+│  5. Environment Variables:                                  │
+│     - NODE_ENV = production                                 │
+│     - PORT = 3002                                           │
+│     - JWT_SECRET = [generate random 32 char]                │
+│  6. Add Disk:                                               │
+│     - Mount: /opt/render/project/src/server                 │
+│     - Size: 1GB                                             │
+│  7. Create Web Service                                      │
+│  8. Tunggu deploy selesai (3-5 menit)                       │
+│  9. Test: https://your-app.onrender.com/api/health          │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 3: UPDATE API URL (2 menit)                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Edit file: .env.production                              │
+│     VITE_API_URL=https://your-app.onrender.com/api          │
+│                                                              │
+│  2. Edit file: src/lib/api.js                               │
+│     Ganti logic untuk production                            │
+│     (lihat DEPLOY_GUIDE.md section 3.1)                     │
+│                                                              │
+│  3. git add .                                               │
+│  4. git commit -m "Update API URL"                          │
+│  5. git push origin main                                    │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 4: DEPLOY FRONTEND KE VERCEL (5 menit)                │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. npm install -g vercel                                   │
+│  2. vercel login                                            │
+│  3. vercel (jawab pertanyaan)                               │
+│  4. vercel --prod                                           │
+│  5. ✅ Frontend live di: https://project.vercel.app         │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 5: UPDATE CORS (3 menit)                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Edit server/server.js                                   │
+│  2. Tambah Vercel URL ke CORS origin                        │
+│  3. git add server/server.js                                │
+│  4. git commit -m "Update CORS"                             │
+│  5. git push origin main                                    │
+│  6. Tunggu Render auto-deploy (2-3 menit)                   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 6: TEST PRODUCTION (5 menit)                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ✅ Buka frontend URL                                       │
+│  ✅ Test login guru                                         │
+│  ✅ Test login siswa                                        │
+│  ✅ Test CRUD (create, read, update, delete)                │
+│  ✅ Test database persistence                               │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+🎉 SELESAI!
+
+Frontend: https://sahabatbk.vercel.app
+Backend:  https://sahabatbk-api.onrender.com
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOKUMENTASI LENGKAP:
+
+Baca file ini untuk detail:
+• DEPLOY_GUIDE.md        → Panduan lengkap step by step
+• KEEP_ALIVE_CRON.md     → Prevent backend sleep (optional)
+• vercel.json            → Config Vercel
+• render.yaml            → Config Render
+• .env.production        → Environment variables
+
+═══════════════════════════════════════════════════════════════
+
+⚠️  TROUBLESHOOTING:
+
+ERROR: "Failed to fetch"
+→ Backend sleep, tunggu 30-60 detik first request
+→ Atau setup keep-alive cron (KEEP_ALIVE_CRON.md)
+
+ERROR: "CORS blocked"
+→ Cek CORS origin di server/server.js
+→ Tambahkan Vercel URL
+
+ERROR: "Database kosong"
+→ Cek disk mount path di Render
+→ Harus: /opt/render/project/src/server
+
+═══════════════════════════════════════════════════════════════
+
+💡 TIPS:
+
+1. Simpan JWT_SECRET di tempat aman (NotePad)
+2. Backup database.sqlite sebelum deploy
+3. Monitor usage di Render dashboard
+4. Setup cron keep-alive untuk UX lebih baik
+5. Test dulu di localhost sebelum push
+
+═══════════════════════════════════════════════════════════════
+
+🔄 UPDATE APLIKASI:
+
+1. Edit code di local
+2. Test di localhost
+3. git add .
+4. git commit -m "Pesan"
+5. git push origin main
+6. Render: auto-deploy (2-3 menit)
+7. Vercel: vercel --prod
+
+═══════════════════════════════════════════════════════════════
+
+📞 BUTUH BANTUAN?
+
+Baca dulu:
+1. DEPLOY_GUIDE.md (panduan lengkap)
+2. Cek Logs di Render dashboard
+3. Cek Console browser (F12)
+4. Screenshot error message
+
+═══════════════════════════════════════════════════════════════
+
+Selamat Deploy! 🚀

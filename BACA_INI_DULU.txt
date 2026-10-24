@@ -1,0 +1,101 @@
+╔═══════════════════════════════════════════════════════════╗
+║       SAHABAT BK - Cara Jalankan dari HP                  ║
+╚═══════════════════════════════════════════════════════════╝
+
+📱 LANGKAH MUDAH:
+
+1. PASTIKAN:
+   ✓ PC dan HP terhubung WiFi yang SAMA
+   ✓ Sudah install npm (cek: npm -v di CMD)
+
+2. KLIK FILE INI (URUTAN PENTING!):
+   
+   Langkah 1: START-BACKEND-SIMPLE.bat
+   (Klik 2x, tunggu sampai muncul "Server berjalan...")
+   (JANGAN TUTUP window ini!)
+   
+   Langkah 2: START-FRONTEND-SIMPLE.bat  
+   (Klik 2x di window baru, tunggu muncul "Local:... Network:...")
+   (JANGAN TUTUP window ini!)
+
+3. BUKA DI HP:
+   - Browser HP → http://192.168.1.10:5174
+   - Selesai! Bisa login Guru/Siswa
+
+═══════════════════════════════════════════════════════════
+
+⚠️ KALAU FILE BAT TIDAK BISA DIKLIK:
+
+Cara Manual:
+
+1. Buka CMD (Command Prompt)
+2. Ketik:
+   cd "c:\Users\ASUS\SAHABAT BK\server"
+   npm start
+
+3. Buka CMD BARU (jangan tutup yang pertama!)
+4. Ketik:
+   cd "c:\Users\ASUS\SAHABAT BK"
+   npm run dev:hp
+
+═══════════════════════════════════════════════════════════
+
+🔥 TROUBLESHOOTING:
+
+"Load Failed" di HP?
+→ Backend belum jalan. Pastikan ada window CMD terbuka dengan tulisan "Server berjalan di..."
+
+"Cannot GET /" di HP?
+→ Frontend belum jalan. Pastikan ada window CMD terbuka dengan tulisan "Local:... Network:..."
+
+IP Address salah?
+1. Buka CMD, ketik: ipconfig
+2. Lihat "IPv4 Address" (contoh: 192.168.1.10)
+3. Edit file .env:
+   - Buka: .env (pakai Notepad)
+   - Ubah: VITE_API_URL=http://[IP_BARU]:3002/api
+   - Save
+4. Restart backend & frontend
+
+Firewall block?
+1. Windows Security → Firewall
+2. "Allow an app through firewall"
+3. Cari "Node.js" → Centang semua
+4. Restart PC
+
+═══════════════════════════════════════════════════════════
+
+📝 FILES PENTING:
+
+Backend:
+- START-BACKEND-SIMPLE.bat ← PAKAI INI
+- start-backend.bat (sama, tapi dengan info)
+
+Frontend:
+- START-FRONTEND-SIMPLE.bat ← PAKAI INI
+- start-frontend-hp.bat (sama, tapi dengan info)
+
+Config:
+- .env (setting API URL)
+- server/.env (setting database)
+
+═══════════════════════════════════════════════════════════
+
+✅ CEK BERHASIL:
+
+Dari PC:
+- http://192.168.1.10:5174 → Tampil landing page
+- http://192.168.1.10:3002 → Tampil "Cannot GET /"
+
+Dari HP:
+- http://192.168.1.10:5174 → Bisa login
+
+═══════════════════════════════════════════════════════════
+
+🎯 QUICK TEST:
+
+1. START-BACKEND-SIMPLE.bat (klik 2x)
+2. START-FRONTEND-SIMPLE.bat (klik 2x)
+3. HP browser → http://192.168.1.10:5174
+
+Done! 🎉

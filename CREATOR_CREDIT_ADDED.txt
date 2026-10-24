@@ -1,0 +1,282 @@
+╔═══════════════════════════════════════════════════════════════╗
+║      ✅ NAMA PEMBUAT SISTEM SUDAH DITAMBAHKAN                 ║
+║           Kartika Wulandari, S.Sos.                           ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📅 Tanggal: 24 Oktober 2026
+✅ Status: SELESAI
+
+═══════════════════════════════════════════════════════════════
+
+👤 NAMA PEMBUAT SISTEM:
+
+    Kartika Wulandari, S.Sos.
+
+═══════════════════════════════════════════════════════════════
+
+📍 LOKASI NAMA PEMBUAT DITAMPILKAN:
+
+1. ✅ LANDING PAGE (Halaman Awal)
+   Lokasi: Bagian bawah card login
+   Tampilan:
+   -------------------------------------------
+   Sahabat BK · Platform Pembelajaran BK untuk SMP
+   
+   Dikembangkan oleh
+   Kartika Wulandari, S.Sos.
+   -------------------------------------------
+
+2. ✅ LOGIN GURU BK
+   Lokasi: Bagian bawah form login
+   Tampilan:
+   -------------------------------------------
+   Belum punya akun? Daftar
+   
+   ───────────────────────
+   Dikembangkan oleh
+   Kartika Wulandari, S.Sos.
+   -------------------------------------------
+
+3. ✅ LOGIN SISWA
+   Lokasi: Bagian bawah form login
+   Tampilan:
+   -------------------------------------------
+   Belum punya akun? Daftar
+   
+   ───────────────────────
+   Dikembangkan oleh
+   Kartika Wulandari, S.Sos.
+   -------------------------------------------
+
+4. ✅ SIDEBAR GURU (Dashboard Guru)
+   Lokasi: Bagian bawah sidebar kiri
+   Tampilan:
+   -------------------------------------------
+   [Tombol Keluar]
+   
+   ───────────────────────
+   Dikembangkan oleh
+   Kartika Wulandari, S.Sos.
+   -------------------------------------------
+
+5. ✅ PROFIL SISWA
+   Lokasi: Bagian bawah halaman profil siswa
+   Tampilan:
+   -------------------------------------------
+   [Tombol Keluar]
+   
+   ┌─────────────────────────────────────┐
+   │ Sistem dikembangkan oleh            │
+   │ Kartika Wulandari, S.Sos.           │
+   │ Sahabat BK © 2026                   │
+   └─────────────────────────────────────┘
+   -------------------------------------------
+
+═══════════════════════════════════════════════════════════════
+
+📁 FILE YANG DIMODIFIKASI:
+
+1. src/pages/auth/LandingPage.jsx
+   - Tambah credit di footer card
+   - Warna biru untuk nama
+
+2. src/pages/auth/LoginTeacher.jsx
+   - Tambah credit di bawah form
+   - Border top untuk pemisah
+   - Warna biru untuk nama
+
+3. src/pages/auth/LoginStudent.jsx
+   - Tambah credit di bawah form
+   - Border top untuk pemisah
+   - Warna hijau emerald untuk nama
+
+4. src/layouts/TeacherLayout.jsx
+   - Tambah credit di sidebar bawah
+   - Di atas tombol Keluar
+   - Border top untuk pemisah
+   - Warna putih untuk nama
+
+5. src/pages/student/StudentProfile.jsx
+   - Tambah credit card di bawah
+   - Gradient background biru
+   - Include copyright Sahabat BK © 2026
+
+═══════════════════════════════════════════════════════════════
+
+🎨 DESAIN & STYLING:
+
+LANDING PAGE:
+• Font size: text-xs (12px)
+• Warna nama: text-blue-700 (biru tua)
+• Layout: Center, 2 baris
+
+LOGIN PAGES (Guru & Siswa):
+• Border top: border-slate-200
+• Padding top: pt-3
+• Font label: text-[10px] (10px), slate-400
+• Font nama: text-xs (12px), bold
+• Warna Guru: text-blue-700
+• Warna Siswa: text-emerald-700
+
+SIDEBAR GURU:
+• Border top: border-blue-700/50
+• Font: text-[10px] (10px)
+• Warna nama: text-white, font-semibold
+• Background: Gradient biru tua sidebar
+
+PROFIL SISWA:
+• Card dengan gradient: slate-50 to blue-50
+• Border: border-blue-100
+• Font label: text-xs, slate-500
+• Font nama: text-sm, blue-800, bold
+• Copyright: text-[10px], slate-400
+
+═══════════════════════════════════════════════════════════════
+
+📋 CARA TEST:
+
+STEP 1: REFRESH BROWSER
+-----------------------
+Tekan: Ctrl + Shift + R
+(untuk load perubahan terbaru)
+
+STEP 2: CEK LANDING PAGE
+------------------------
+1. Buka: http://localhost:5173
+2. Scroll ke bawah card
+3. ✅ Harus muncul:
+   "Dikembangkan oleh
+    Kartika Wulandari, S.Sos."
+
+STEP 3: CEK LOGIN GURU
+----------------------
+1. Klik tombol "Guru BK"
+2. Scroll ke bawah form login
+3. ✅ Harus muncul nama pembuat di bawah
+   "Belum punya akun? Daftar"
+
+STEP 4: CEK LOGIN SISWA
+-----------------------
+1. Kembali ke landing page
+2. Klik tombol "Siswa"
+3. Scroll ke bawah form login
+4. ✅ Harus muncul nama pembuat (warna hijau)
+
+STEP 5: CEK SIDEBAR GURU
+------------------------
+1. Login sebagai Guru
+2. Lihat sidebar kiri
+3. Scroll ke bawah
+4. ✅ Di atas tombol "Keluar" ada nama pembuat
+
+STEP 6: CEK PROFIL SISWA
+------------------------
+1. Login sebagai Siswa
+2. Klik tab "Profil" (paling kanan bawah)
+3. Scroll ke bawah halaman
+4. ✅ Di bawah tombol "Keluar" ada card credit
+   dengan gradient biru
+
+═══════════════════════════════════════════════════════════════
+
+✅ YANG SUDAH DITAMBAHKAN:
+
+1. ✅ Nama: Kartika Wulandari, S.Sos.
+2. ✅ Label: "Dikembangkan oleh"
+3. ✅ Copyright: "Sahabat BK © 2026" (di profil siswa)
+4. ✅ Styling sesuai tema masing-masing halaman
+5. ✅ Responsive untuk mobile & desktop
+6. ✅ Posisi strategis & tidak mengganggu UX
+
+═══════════════════════════════════════════════════════════════
+
+🎯 TAMPILAN VISUAL:
+
+┌─────────────────────────────────────────────────────────────┐
+│                     LANDING PAGE                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   [Karakter Siswa]                                          │
+│   Sahabat BK                                                │
+│   Belajar • Bertumbuh • Jadi Versi Terbaik                 │
+│                                                              │
+│   [Tombol Guru BK]                                          │
+│   [Tombol Siswa]                                            │
+│                                                              │
+│   Sahabat BK · Platform Pembelajaran BK untuk SMP           │
+│   Dikembangkan oleh Kartika Wulandari, S.Sos.              │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                   SIDEBAR GURU BK                            │
+├─────────────────────────────────────────────────────────────┤
+│  [Logo] Sahabat BK                                          │
+│  [Foto] Guru BK                                             │
+│                                                              │
+│  📊 Dashboard                                               │
+│  🎓 Kelola Kelas                                            │
+│  👥 Data Siswa                                              │
+│  📚 Bank Soal                                               │
+│  📋 Absensi Digital                                         │
+│  📊 Laporan & Analitik                                      │
+│  💬 Layanan BK                                              │
+│  ⚙️ Pengaturan                                              │
+│                                                              │
+│  ───────────────────────────────────                        │
+│  🚪 Keluar                                                  │
+│                                                              │
+│  Dikembangkan oleh                                          │
+│  Kartika Wulandari, S.Sos.                                  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                    PROFIL SISWA                              │
+├─────────────────────────────────────────────────────────────┤
+│  [Badge Saya]                                               │
+│                                                              │
+│  🚪 Keluar                                                  │
+│                                                              │
+│  ┌───────────────────────────────────────────┐             │
+│  │ Sistem dikembangkan oleh                  │             │
+│  │ Kartika Wulandari, S.Sos.                 │             │
+│  │ Sahabat BK © 2026                         │             │
+│  └───────────────────────────────────────────┘             │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+💡 CATATAN:
+
+• Nama pembuat ditampilkan dengan font yang jelas & mudah dibaca
+• Warna menyesuaikan dengan tema masing-masing halaman
+• Tidak mengganggu user experience
+• Posisi strategis di bagian bawah/footer
+• Responsive untuk semua ukuran layar
+
+═══════════════════════════════════════════════════════════════
+
+🚀 CARA LIHAT PERUBAHAN:
+
+1. Hard refresh browser (Ctrl+Shift+R)
+2. Kunjungi landing page → scroll ke bawah
+3. Login sebagai Guru → lihat sidebar bawah
+4. Login sebagai Siswa → buka Profil → scroll bawah
+5. Semua halaman login juga ada creditnya
+
+═══════════════════════════════════════════════════════════════
+
+✅ KESIMPULAN:
+
+Nama pembuat sistem "Kartika Wulandari, S.Sos." sudah 
+ditambahkan di 5 lokasi strategis:
+
+1. ✅ Landing Page
+2. ✅ Login Guru
+3. ✅ Login Siswa
+4. ✅ Sidebar Dashboard Guru
+5. ✅ Halaman Profil Siswa
+
+Semua dengan styling yang sesuai dan tidak mengganggu UX!
+
+═══════════════════════════════════════════════════════════════

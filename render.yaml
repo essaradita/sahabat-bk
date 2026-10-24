@@ -1,0 +1,41 @@
+# ============================================================
+# RENDER BLUEPRINT - Backend Deployment Config
+# ============================================================
+
+services:
+  # Backend Web Service
+  - type: web
+    name: sahabatbk-api
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3002
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/server/database.sqlite
+    
+    # Persistent Disk untuk Database SQLite
+    disk:
+      name: database-disk
+      mountPath: /opt/render/project/src/server
+      sizeGB: 1
+    
+    # Health Check
+    healthCheckPath: /api/health
+    
+    # Auto Deploy dari GitHub
+    autoDeploy: true
+
+# ============================================================
+# CATATAN:
+# - Free tier: 512MB RAM, 0.1 CPU
+# - Sleep after 15 minutes of inactivity
+# - Persistent disk: Gratis 1GB untuk database
+# ============================================================

@@ -1,0 +1,181 @@
+╔═══════════════════════════════════════════════════════════╗
+║        🔧 FIX: HTTP ERROR 400 di HP                      ║
+╚═══════════════════════════════════════════════════════════╝
+
+MASALAH:
+✅ HP bisa akses frontend (192.168.1.10:5174)
+❌ HTTP ERROR 400 saat load halaman
+
+PENYEBAB:
+Backend API tidak bisa diakses dari HP karena:
+1. CORS tidak cukup permisif
+2. Backend tidak return JSON yang valid
+3. Network request gagal
+
+═══════════════════════════════════════════════════════════
+SOLUSI: RESTART BACKEND & FRONTEND
+═══════════════════════════════════════════════════════════
+
+STEP 1: Stop Backend & Frontend
+────────────────────────────────
+1. Cari window CMD/PowerShell yang jalan
+2. Tekan Ctrl+C di masing-masing window
+3. Ketik: Y (untuk confirm)
+4. Tutup semua window
+
+STEP 2: Start Backend BARU
+───────────────────────────
+Klik 2x: RUN-BACKEND.bat
+
+Tunggu sampai muncul:
+┌────────────────────────────────────┐
+│ 🚀 Server berjalan di              │
+│ http://localhost:3002              │
+│ 📱 Akses dari HP:                   │
+│ http://192.168.1.10:3002           │
+└────────────────────────────────────┘
+
+STEP 3: Start Frontend BARU
+────────────────────────────
+Klik 2x: RUN-FRONTEND.bat
+
+Tunggu sampai muncul:
+┌────────────────────────────────────┐
+│ ➜ Local:   http://localhost:5174  │
+│ ➜ Network: http://192.168.1.10:5174│
+└────────────────────────────────────┘
+
+STEP 4: Test dari HP
+─────────────────────
+Browser HP → http://192.168.1.10:5174
+
+═══════════════════════════════════════════════════════════
+PERUBAHAN YANG SUDAH DILAKUKAN
+═══════════════════════════════════════════════════════════
+
+Backend (server/server.js):
+✅ CORS lebih permisif (allow all origins)
+✅ Tambah request logging (bisa lihat di CMD)
+✅ Tambah health check endpoint:
+   - GET / → info server
+   - GET /api → list endpoints
+   - GET /api/health → cek status
+
+Frontend (src/lib/api.js):
+✅ Better error handling
+✅ Timeout 30 detik
+✅ Lebih jelas error message
+✅ Detect non-JSON response
+
+═══════════════════════════════════════════════════════════
+TEST KONEKSI BACKEND
+═══════════════════════════════════════════════════════════
+
+Setelah restart, test di HP browser:
+
+Test 1: Health Check
+http://192.168.1.10:3002/api/health
+
+Expected Response:
+{
+  "status": "healthy",
+  "database": "connected",
+  "timestamp": "2024-..."
+}
+
+Test 2: API Info
+http://192.168.1.10:3002/api
+
+Expected Response:
+{
+  "status": "OK",
+  "message": "SAHABAT BK API",
+  "endpoints": [...]
+}
+
+Test 3: Root
+http://192.168.1.10:3002
+
+Expected Response:
+{
+  "status": "OK",
+  "message": "SAHABAT BK API Server",
+  ...
+}
+
+═══════════════════════════════════════════════════════════
+LIHAT LOG BACKEND
+═══════════════════════════════════════════════════════════
+
+Setelah restart backend, window CMD akan tampilkan:
+
+Saat HP akses:
+📥 GET /api/auth/profile from ::ffff:192.168.1.4
+
+Ini bagus! Artinya backend menerima request dari HP.
+
+Kalau tidak muncul log = request tidak sampai ke backend
+→ Masalah di firewall/network
+
+═══════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════
+
+Problem: HTTP 400 masih muncul
+Solution:
+1. Clear cache browser HP
+2. Force reload (Ctrl+Shift+R atau clear data)
+3. Coba browser lain (Chrome/Firefox)
+4. Restart HP
+
+Problem: "Failed to fetch"
+Solution:
+1. Matikan firewall SEMENTARA
+2. Test lagi dari HP
+3. Kalau berhasil = allow Node.js di firewall
+4. Nyalakan firewall lagi
+
+Problem: Backend tidak bisa start
+Solution:
+1. Pastikan port 3002 tidak dipakai:
+   netstat -ano | findstr :3002
+2. Kalau ada, kill process atau ganti port
+3. Edit server/.env: PORT=3003
+4. Edit .env: VITE_API_URL=http://192.168.1.10:3003/api
+5. Restart
+
+Problem: Test 1,2,3 gagal semua
+Solution:
+Backend tidak bisa diakses dari HP
+→ Cek firewall (paling sering)
+→ Cek WiFi sama
+→ Restart router
+
+═══════════════════════════════════════════════════════════
+QUICK CHECK
+═══════════════════════════════════════════════════════════
+
+Di laptop browser:
+http://192.168.1.10:3002/api/health
+
+Harus muncul JSON {"status":"healthy",...}
+
+Kalau laptop bisa, HP tidak:
+→ Firewall block HP
+→ Matikan firewall sementara untuk test
+
+Kalau laptop juga tidak bisa:
+→ Backend tidak listen di 0.0.0.0
+→ Sudah diperbaiki, restart saja
+
+═══════════════════════════════════════════════════════════
+
+🎯 INTINYA: RESTART BACKEND & FRONTEND!
+
+Files sudah diupdate dengan:
+- CORS lebih permisif
+- Better logging
+- Health check endpoints
+- Better error messages
+
+Tinggal restart dan test lagi!

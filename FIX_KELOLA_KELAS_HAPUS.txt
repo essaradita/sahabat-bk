@@ -1,0 +1,382 @@
+╔═══════════════════════════════════════════════════════════════╗
+║         ✅ FIXED: KELOLA KELAS - HAPUS TIDAK PERMANEN         ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📅 Tanggal: 24 Oktober 2026
+🐛 Bug: Kelas yang dihapus muncul lagi setelah refresh
+
+═══════════════════════════════════════════════════════════════
+
+🔍 MASALAH YANG DILAPORKAN:
+
+User mencoba hapus Kelas 8B:
+✅ Muncul notifikasi "Kelas berhasil dihapus"
+✅ Kelas hilang dari tampilan
+❌ Setelah refresh halaman → Kelas 8B muncul lagi
+
+═══════════════════════════════════════════════════════════════
+
+🔎 ANALISA MASALAH:
+
+ROOT CAUSE:
+- Fungsi handleDelete() hanya menghapus dari state React (useState)
+- Data tidak tersimpan ke database
+- Saat refresh, data dimuat dari demoClasses yang masih utuh
+
+KODE LAMA (SALAH):
+```javascript
+function handleDelete(id) {
+  setClasses(prev => prev.filter(c => c.id !== id))  // Hanya hapus di state
+  toast('Kelas berhasil dihapus', 'info')
+  // ❌ Tidak ada API call ke backend!
+}
+```
+
+MASALAH BACKEND:
+- Table 'classes' belum dibuat di SQLite
+- API endpoints untuk class management belum ada
+- Frontend tidak bisa menyimpan perubahan
+
+═══════════════════════════════════════════════════════════════
+
+✅ SOLUSI YANG DITERAPKAN:
+
+1. ✅ TAMBAH TABLE DI DATABASE
+   File: server/db-sqlite.js
+   - Ditambahkan table 'classes' dengan kolom:
+     * id (primary key)
+     * name (nama kelas)
+     * grade (tingkat 7-9)
+     * teacher_name (wali kelas)
+     * teacher_id (foreign key)
+     * student_count (jumlah siswa)
+     * created_at, updated_at (timestamp)
+
+2. ✅ TAMBAH API ENDPOINTS DI BACKEND
+   File: server/server.js
+   - GET    /api/teacher/classes → Ambil semua kelas
+   - POST   /api/teacher/classes → Buat kelas baru
+   - PUT    /api/teacher/classes/:id → Update kelas
+   - DELETE /api/teacher/classes/:id → Hapus kelas
+   
+   Semua endpoint:
+   • Dilindungi dengan verifyToken
+   • Cek role teacher
+   • Error handling lengkap
+   • Console logging untuk debugging
+
+3. ✅ TAMBAH API METHODS DI FRONTEND
+   File: src/lib/api.js
+   - apiClient.getClasses()
+   - apiClient.createClass(data)
+   - apiClient.updateClass(id, data)
+   - apiClient.deleteClass(id)
+
+4. ✅ UPDATE FRONTEND COMPONENT
+   File: src/pages/teacher/ManageClasses.jsx
+   
+   A. Tambah useEffect untuk load dari database:
+      ```javascript
+      useEffect(() => {
+        async function fetchClasses() {
+          const data = await apiClient.getClasses()
+          setClasses(data)
+        }
+        fetchClasses()
+      }, [])
+      ```
+   
+   B. Update handleSave() untuk simpan ke database:
+      ```javascript
+      async function handleSave() {
+        if (editingClass) {
+          const result = await apiClient.updateClass(id, form)
+          setClasses(prev => prev.map(c => c.id === id ? result.class : c))
+        } else {
+          const result = await apiClient.createClass(form)
+          setClasses(prev => [result.class, ...prev])
+        }
+      }
+      ```
+   
+   C. Update handleDelete() untuk hapus dari database:
+      ```javascript
+      async function handleDelete(id) {
+        await apiClient.deleteClass(id)  // ✅ Hapus dari database
+        setClasses(prev => prev.filter(c => c.id !== id))
+        toast('Kelas berhasil dihapus', 'success')
+      }
+      ```
+   
+   D. Tambah loading state:
+      ```javascript
+      if (loading) {
+        return <Loader2 /> // Spinner saat loading
+      }
+      ```
+
+═══════════════════════════════════════════════════════════════
+
+📊 PERUBAHAN DETAIL:
+
+FILE 1: server/db-sqlite.js
+--------
+BEFORE:
+  • Table 'classes' tidak ada
+  
+AFTER:
+  • ✅ Table 'classes' ditambahkan
+  • ✅ Indexes untuk grade dan teacher_id
+  • ✅ Foreign key ke profiles table
+
+FILE 2: server/server.js
+--------
+BEFORE:
+  • Tidak ada endpoint untuk classes
+  
+AFTER:
+  • ✅ GET    /api/teacher/classes
+  • ✅ POST   /api/teacher/classes
+  • ✅ PUT    /api/teacher/classes/:id
+  • ✅ DELETE /api/teacher/classes/:id
+  • ✅ Semua endpoint dengan auth & error handling
+
+FILE 3: src/lib/api.js
+--------
+BEFORE:
+  • Tidak ada method untuk classes
+  
+AFTER:
+  • ✅ getClasses()
+  • ✅ createClass(data)
+  • ✅ updateClass(id, data)
+  • ✅ deleteClass(id)
+
+FILE 4: src/pages/teacher/ManageClasses.jsx
+--------
+BEFORE:
+  • Load dari demoClasses (hardcoded)
+  • Simpan hanya di state React
+  • Hapus hanya dari state React
+  
+AFTER:
+  • ✅ Load dari database via API
+  • ✅ Simpan ke database via API
+  • ✅ Hapus dari database via API
+  • ✅ Auto-migrate demo data ke database
+  • ✅ Loading state dengan spinner
+  • ✅ Error handling dengan toast
+  • ✅ Console logging untuk debugging
+
+═══════════════════════════════════════════════════════════════
+
+🎯 HASIL YANG DIHARAPKAN:
+
+SEBELUM FIX:
+1. Hapus Kelas 8B → muncul notif berhasil
+2. Kelas 8B hilang dari tampilan
+3. Refresh halaman
+4. ❌ Kelas 8B muncul lagi (tidak tersimpan)
+
+SETELAH FIX:
+1. Hapus Kelas 8B → muncul notif berhasil
+2. Kelas 8B hilang dari tampilan
+3. ✅ Data terhapus dari database SQLite
+4. Refresh halaman
+5. ✅ Kelas 8B tetap tidak ada (permanen)
+
+═══════════════════════════════════════════════════════════════
+
+📋 CARA TEST:
+
+STEP 1: RESTART BACKEND
+-----------------------
+⚠️ WAJIB! Database schema sudah diupdate
+
+1. Tutup terminal backend yang jalan
+2. Jalankan lagi backend:
+   • Klik: START-ALL-HP.bat
+   • Atau manual: node server/server.js
+3. Cek terminal backend muncul:
+   ✅ "SQLite Database initialized"
+   ✅ "Server berjalan di http://localhost:3002"
+
+STEP 2: HARD REFRESH FRONTEND
+-----------------------------
+1. Di browser, tekan: Ctrl + Shift + R
+2. Atau buka Incognito mode
+
+STEP 3: TEST KELOLA KELAS
+--------------------------
+A. TEST LOAD DATA
+   1. Login sebagai Guru
+   2. Klik menu "Kelola Kelas"
+   3. ✅ Muncul loading spinner dulu
+   4. ✅ Muncul daftar kelas
+   5. ✅ Console (F12): "Classes loaded: [...]"
+
+B. TEST HAPUS KELAS
+   1. Klik icon sampah 🗑️ pada Kelas 8B
+   2. ✅ Muncul dialog konfirmasi:
+      "Hapus Kelas?"
+      "Data kelas dan semua keanggotaan siswa akan dihapus..."
+   3. Klik "Hapus"
+   4. ✅ Kelas 8B hilang dari tampilan
+   5. ✅ Muncul notif: "Kelas berhasil dihapus"
+   6. ✅ Console: "Deleting class: cls-xxx"
+   7. REFRESH HALAMAN (F5)
+   8. ✅ Kelas 8B TETAP TIDAK ADA (tidak muncul lagi)
+
+C. TEST TAMBAH KELAS
+   1. Klik tombol "Tambah Kelas"
+   2. Isi form:
+      • Nama: Kelas 9C
+      • Tingkat: Kelas 9
+   3. Klik "Simpan"
+   4. ✅ Kelas 9C muncul di daftar
+   5. ✅ Notif: "Kelas baru berhasil dibuat!"
+   6. REFRESH HALAMAN
+   7. ✅ Kelas 9C TETAP ADA (tersimpan permanen)
+
+D. TEST EDIT KELAS
+   1. Klik icon pensil ✏️ pada kelas
+   2. Ubah nama: "Kelas 8A" → "Kelas 8A Unggulan"
+   3. Klik "Simpan"
+   4. ✅ Nama berubah di tampilan
+   5. ✅ Notif: "Kelas berhasil diperbarui!"
+   6. REFRESH HALAMAN
+   7. ✅ Nama tetap "Kelas 8A Unggulan" (tersimpan)
+
+═══════════════════════════════════════════════════════════════
+
+🔍 DEBUGGING TIPS:
+
+JIKA MASIH MUNCUL LAGI SETELAH REFRESH:
+
+1. CEK BACKEND JALAN:
+   • Buka: http://localhost:3002/api/health
+   • Harus muncul: {"status":"healthy"}
+   • Jika error → restart backend
+
+2. CEK DATABASE TABLE:
+   • Buka terminal backend
+   • Harus ada tulisan: "SQLite Database initialized"
+   • Jika tidak ada → database belum terupdate
+
+3. CEK CONSOLE (F12):
+   A. Saat load halaman:
+      • Harus ada: "Classes loaded: [...]"
+      • Jika ada error merah → kirim screenshot
+   
+   B. Saat hapus kelas:
+      • Harus ada: "Deleting class: cls-xxx"
+      • Harus ada: API request ke DELETE /api/teacher/classes/...
+      • Jika ada error 404/500 → backend bermasalah
+
+4. CEK NETWORK TAB (F12):
+   • Tab Network → filter: Fetch/XHR
+   • Saat hapus kelas, harus ada:
+     ✅ DELETE /api/teacher/classes/cls-xxx
+     ✅ Status: 200 OK
+     ✅ Response: {"success":true,"message":"..."}
+
+═══════════════════════════════════════════════════════════════
+
+❌ KEMUNGKINAN ERROR & SOLUSI:
+
+ERROR 1: "Failed to fetch classes"
+PENYEBAB: Backend tidak jalan
+SOLUSI: Restart backend dengan START-ALL-HP.bat
+
+ERROR 2: "Gagal menghapus kelas: 404"
+PENYEBAB: Endpoint tidak ditemukan
+SOLUSI: 
+  • Pastikan backend sudah direstart
+  • Cek file server/server.js sudah terupdate
+
+ERROR 3: "no such table: classes"
+PENYEBAB: Database belum terupdate
+SOLUSI:
+  • Tutup backend
+  • HAPUS file: server/database.sqlite
+  • Jalankan lagi backend (akan buat table baru)
+
+ERROR 4: Kelas masih muncul lagi setelah refresh
+PENYEBAB: Masih load dari demoClasses
+SOLUSI:
+  • Hard refresh (Ctrl+Shift+R)
+  • Atau clear browser cache
+  • Atau buka Incognito mode
+
+═══════════════════════════════════════════════════════════════
+
+✅ FITUR LAIN YANG SUDAH TERINTEGRASI:
+
+1. ✅ AUTO-MIGRATE DEMO DATA
+   • Jika database kosong
+   • Demo classes otomatis disimpan ke database
+   • User tidak perlu input ulang
+
+2. ✅ LOADING STATE
+   • Spinner saat load data
+   • Pesan "Memuat data kelas..."
+
+3. ✅ ERROR HANDLING
+   • Toast notification untuk error
+   • Console.log untuk debugging
+   • Fallback ke demo data jika API gagal
+
+4. ✅ CONFIRMATION DIALOG
+   • Dialog sebelum hapus
+   • Pesan warning yang jelas
+   • Tombol Batal & Hapus
+
+5. ✅ SUCCESS FEEDBACK
+   • Toast notification berhasil
+   • Data langsung update di tampilan
+
+═══════════════════════════════════════════════════════════════
+
+📝 CHECKLIST TESTING:
+
+Sebelum lapor hasil:
+□ Sudah restart backend
+□ Sudah hard refresh browser (Ctrl+Shift+R)
+□ Sudah test hapus kelas
+□ Sudah refresh halaman setelah hapus
+□ Sudah cek Console (F12) untuk error
+□ Sudah cek Network tab untuk API call
+
+Jika semua ✅ dan kelas tetap tidak muncul lagi = BERHASIL!
+
+═══════════════════════════════════════════════════════════════
+
+🎉 KESIMPULAN:
+
+SEBELUM:
+❌ Hapus kelas hanya di state React
+❌ Tidak tersimpan ke database
+❌ Setelah refresh, kelas muncul lagi
+
+SEKARANG:
+✅ Hapus kelas langsung ke database
+✅ Permanen tersimpan
+✅ Setelah refresh, kelas tetap terhapus
+✅ Semua perubahan (tambah, edit, hapus) tersimpan
+✅ Loading state dan error handling lengkap
+
+═══════════════════════════════════════════════════════════════
+
+📞 NEXT STEPS:
+
+1. Restart backend (WAJIB!)
+2. Hard refresh browser
+3. Test hapus kelas
+4. Refresh halaman
+5. Lapor hasil:
+   ✅ Berhasil → kelas tidak muncul lagi
+   ❌ Masih error → kirim screenshot Console (F12)
+
+Good luck testing! 🚀
+
+═══════════════════════════════════════════════════════════════

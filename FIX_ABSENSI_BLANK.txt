@@ -1,0 +1,144 @@
+╔═══════════════════════════════════════════════════════════╗
+║        🔧 FIX: ABSENSI DIGITAL BLANK PUTIH               ║
+╚═══════════════════════════════════════════════════════════╝
+
+MASALAH:
+Menu Absensi Digital → Blank putih / error
+
+PENYEBAB:
+1. Import apiClient hilang
+2. Import Loader2 icon hilang
+3. Error handling kurang
+
+SUDAH DIPERBAIKI:
+✅ Import apiClient ditambahkan
+✅ Import Loader2 ditambahkan
+✅ Error handling lebih baik
+✅ Console logging untuk debug
+✅ Toast notification untuk error
+
+═══════════════════════════════════════════════════════════
+CARA TEST (REFRESH BROWSER!)
+═══════════════════════════════════════════════════════════
+
+1. REFRESH BROWSER
+   ───────────────
+   - Tekan F5 atau Ctrl+R
+   - Atau hard refresh: Ctrl+Shift+R
+
+2. BUKA MENU ABSENSI
+   ─────────────────
+   - Dari dashboard guru
+   - Klik "Absensi Digital"
+
+3. HASIL YANG DIHARAPKAN
+   ─────────────────────
+   
+   A. Jika Ada Siswa:
+   ✅ Tampil list siswa
+   ✅ Bisa pilih kelas
+   ✅ Bisa pilih tanggal
+   ✅ Bisa mark status (Hadir/Izin/Sakit/Alpa)
+   ✅ Bisa simpan
+   
+   B. Jika Belum Ada Siswa:
+   ✅ Tampil pesan: "Belum Ada Data Siswa"
+   ✅ Ada tombol: "Tambah Siswa Sekarang"
+   ✅ Klik → Redirect ke Data Siswa
+
+═══════════════════════════════════════════════════════════
+KALAU MASIH BLANK / ERROR
+═══════════════════════════════════════════════════════════
+
+1. CEK CONSOLE BROWSER
+   ───────────────────
+   - Tekan F12
+   - Tab "Console"
+   - Lihat error message
+   - Screenshot dan kasih tau
+
+2. CEK BACKEND
+   ────────────
+   Backend harus jalan!
+   - Window CMD backend masih terbuka?
+   - Test: http://192.168.1.10:3002/api/health
+
+3. CEK DATA SISWA
+   ──────────────
+   - Menu: Data Siswa
+   - Tab: Data Absensi
+   - Harus ada minimal 1 siswa
+
+4. RESTART FRONTEND
+   ────────────────
+   - Ctrl+C di window frontend
+   - RUN-FRONTEND.bat
+   - Refresh browser (Ctrl+Shift+R)
+
+═══════════════════════════════════════════════════════════
+CARA TAMBAH SISWA UNTUK ABSENSI
+═══════════════════════════════════════════════════════════
+
+1. Menu: Data Siswa
+2. Klik tab: "Data Absensi"
+3. Klik: "Tambah Siswa Manual"
+4. Isi:
+   - Nama: (nama siswa)
+   - Kelas: (contoh: 7A)
+5. Klik: "Tambah"
+6. Ulangi untuk siswa lain
+7. Kembali ke: Absensi Digital
+
+═══════════════════════════════════════════════════════════
+FITUR ABSENSI DIGITAL
+═══════════════════════════════════════════════════════════
+
+Tab "Input Absensi":
+✅ Pilih kelas
+✅ Pilih tanggal
+✅ Mark status per siswa
+✅ Tombol "Semua Hadir" (quick action)
+✅ Summary: Hadir/Izin/Sakit/Alpa
+✅ Simpan ke database
+✅ Unduh CSV
+
+Tab "Rekap":
+✅ Riwayat absensi per tanggal
+✅ Summary per session
+✅ Persentase kehadiran
+✅ Visual progress bar
+
+═══════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════
+
+Error: "Gagal memuat data siswa"
+→ Backend tidak jalan atau API error
+→ Cek backend CMD window
+→ Restart backend
+
+Error: "Gagal menyimpan absensi"
+→ Database error
+→ Cek console untuk detail
+→ Restart backend
+
+Blank putih terus:
+→ Clear cache browser
+→ Hard refresh (Ctrl+Shift+R)
+→ Restart frontend
+
+Data tidak muncul:
+→ Belum ada siswa di Data Absensi
+→ Tambah siswa dulu
+
+═══════════════════════════════════════════════════════════
+
+🎯 QUICK FIX:
+
+1. F5 (Refresh browser)
+2. Buka Absensi Digital
+3. Kalau masih blank:
+   - F12 → Console → Screenshot error
+   - Kasih tau error message
+
+═══════════════════════════════════════════════════════════

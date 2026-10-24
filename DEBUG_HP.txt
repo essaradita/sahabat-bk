@@ -1,0 +1,237 @@
+╔═══════════════════════════════════════════════════════════╗
+║     🔍 DEBUG: HP TIDAK BISA LOGIN (LAPTOP BISA)          ║
+╚═══════════════════════════════════════════════════════════╝
+
+STATUS SAAT INI:
+✅ Backend jalan (port 3002 listening)
+✅ Frontend jalan (port 5173/5174 listening)  
+✅ Laptop bisa login
+❌ HP tidak bisa login
+
+═══════════════════════════════════════════════════════════
+STEP 1: TEST KONEKSI DASAR
+═══════════════════════════════════════════════════════════
+
+Di HP, buka browser dan test URL ini satu per satu:
+
+1. Test Frontend:
+   http://192.168.1.10:5174
+   
+   Expected: Tampil halaman landing
+   Problem: Blank/tidak bisa akses → Cek Step 2
+
+2. Test Backend:
+   http://192.168.1.10:3002
+   
+   Expected: Muncul "Cannot GET /" (INI NORMAL!)
+   Problem: Connection Refused → Cek Step 3
+
+3. Test API:
+   http://192.168.1.10:3002/api/auth/profile
+   
+   Expected: {"error":"Token tidak ditemukan"} (INI NORMAL!)
+   Problem: Tidak muncul JSON → Cek Step 3
+
+═══════════════════════════════════════════════════════════
+STEP 2: TEST KONEKSI FRONTEND DARI HP
+═══════════════════════════════════════════════════════════
+
+A. Cek Port yang Digunakan
+   
+   Di laptop, lihat window frontend CMD/PowerShell:
+   
+   ┌────────────────────────────────────────┐
+   │ ➜ Local:   http://localhost:5174      │
+   │ ➜ Network: http://192.168.1.10:5174   │ ← CATAT INI!
+   └────────────────────────────────────────┘
+   
+   Kalau muncul port 5173 bukan 5174, gunakan itu!
+
+B. Test dari HP
+   
+   Buka: http://192.168.1.10:[PORT]
+   Ganti [PORT] dengan port yang tertera di CMD
+
+═══════════════════════════════════════════════════════════
+STEP 3: TEST API DENGAN TOOL DIAGNOSTIK
+═══════════════════════════════════════════════════════════
+
+Di HP browser, buka:
+http://192.168.1.10:5174/test-api.html
+
+Halaman ini akan:
+✓ Cek koneksi ke backend
+✓ Test login
+✓ Tampilkan error detail
+
+Ikuti instruksi di halaman tersebut.
+
+═══════════════════════════════════════════════════════════
+STEP 4: CEK FIREWALL WINDOWS
+═══════════════════════════════════════════════════════════
+
+Kadang Windows Firewall block koneksi dari HP.
+
+A. Cek Status Firewall:
+   
+   1. Start → "Windows Defender Firewall"
+   2. Klik "Allow an app through firewall"
+   3. Cari "Node.js"
+   4. Pastikan centang "Private" DAN "Public"
+
+B. Kalau Node.js tidak ada dalam list:
+   
+   1. Klik "Allow another app..."
+   2. Browse ke: C:\Program Files\nodejs\node.exe
+   3. Add
+   4. Centang Private & Public
+   5. OK
+
+C. Restart Backend & Frontend
+
+═══════════════════════════════════════════════════════════
+STEP 5: CEK WIFI NETWORK
+═══════════════════════════════════════════════════════════
+
+A. Pastikan WiFi yang SAMA
+   
+   Laptop:
+   1. Klik icon WiFi
+   2. Catat nama WiFi (contoh: "TP-Link_Home")
+   
+   HP:
+   1. Settings → WiFi
+   2. Harus tersambung ke WiFi yang SAMA
+
+B. Jangan Pakai Hotspot HP
+   
+   ❌ SALAH: Laptop pakai WiFi, HP pakai Hotspot
+   ✅ BENAR: Laptop dan HP pakai WiFi rumah yang sama
+
+═══════════════════════════════════════════════════════════
+STEP 6: CEK BROWSER HP
+═══════════════════════════════════════════════════════════
+
+Beberapa browser HP ada masalah. Coba browser lain:
+
+✓ Chrome (Recommended)
+✓ Firefox
+✓ Edge
+❌ Browser bawaan HP (kadang bermasalah)
+
+Clear cache & cookies:
+1. Settings → Privacy → Clear browsing data
+2. Pilih "All time"
+3. Clear
+
+═══════════════════════════════════════════════════════════
+STEP 7: CEK ERROR DI CONSOLE
+═══════════════════════════════════════════════════════════
+
+Di HP browser (Chrome):
+
+1. Buka: http://192.168.1.10:5174
+2. Ketuk menu (3 titik) → "Desktop site" (centang)
+3. Ketuk menu → "Inspect" atau "Developer Tools"
+4. Tab "Console"
+5. Coba login
+6. Lihat error apa yang muncul
+
+Common Errors:
+
+• "Failed to fetch" / "Network error"
+  → Backend tidak bisa diakses
+  → Cek firewall
+
+• "Unexpected token '<'"
+  → Backend mati / tidak jalan
+  → Restart backend
+
+• "ERR_CONNECTION_REFUSED"
+  → Port salah atau backend mati
+  → Cek port di CMD window
+
+• "404 Not Found"
+  → API URL salah
+  → Cek .env
+
+═══════════════════════════════════════════════════════════
+STEP 8: SOLUSI ALTERNATIF (TEMPORARY)
+═══════════════════════════════════════════════════════════
+
+Jika HP tetap tidak bisa, coba matikan firewall SEMENTARA:
+
+1. Start → "Windows Defender Firewall"
+2. "Turn Windows Defender Firewall on or off"
+3. Pilih "Turn off" untuk Private & Public
+4. Test dari HP
+5. JANGAN LUPA NYALAKAN LAGI!
+
+Kalau berhasil = Masalah di Firewall
+Solusi: Tambah exception untuk Node.js (Step 4)
+
+═══════════════════════════════════════════════════════════
+STEP 9: CEK IP ADDRESS TIDAK BERUBAH
+═══════════════════════════════════════════════════════════
+
+IP address bisa berubah saat restart router/PC.
+
+Di laptop CMD:
+ipconfig
+
+Cari "IPv4 Address":
+192.168.1.10 ← Harus ini
+
+Kalau beda:
+1. Edit .env
+2. Update VITE_API_URL dengan IP baru
+3. Restart backend & frontend
+
+═══════════════════════════════════════════════════════════
+STEP 10: TEST DARI LAPTOP SEBAGAI HP
+═══════════════════════════════════════════════════════════
+
+Di laptop, buka browser:
+http://192.168.1.10:5174
+
+(Pakai IP, bukan localhost!)
+
+Kalau laptop pakai IP juga tidak bisa:
+→ Masalah di konfigurasi, bukan di HP
+→ Cek .env dan restart
+
+Kalau laptop pakai IP bisa:
+→ Masalah di HP atau firewall
+→ Cek firewall (Step 4)
+
+═══════════════════════════════════════════════════════════
+📊 CHECKLIST LENGKAP
+═══════════════════════════════════════════════════════════
+
+□ Backend jalan (CMD window terbuka)
+□ Frontend jalan (CMD window terbuka)
+□ Port benar (5173 atau 5174)
+□ IP benar (192.168.1.10)
+□ WiFi sama (laptop & HP)
+□ Firewall allow Node.js
+□ Browser HP: Chrome/Firefox
+□ Cache browser HP sudah di-clear
+□ Test dari laptop pakai IP (bukan localhost) bisa
+□ http://192.168.1.10:3002 di HP muncul "Cannot GET /"
+□ http://192.168.1.10:5174/test-api.html bisa dibuka
+
+═══════════════════════════════════════════════════════════
+🆘 MASIH TIDAK BISA?
+═══════════════════════════════════════════════════════════
+
+Coba RESTART SEMUA:
+1. Tutup backend & frontend (Ctrl+C)
+2. Restart router WiFi (off 10 detik, on lagi)
+3. Restart laptop
+4. Restart HP
+5. Coba lagi dari awal
+
+Kalau masih tidak bisa, kasih tau:
+• Error message di HP console (Step 7)
+• Hasil test dari test-api.html (Step 3)
+• Screenshot error di HP

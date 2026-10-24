@@ -1,0 +1,69 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║        ⚡ RESTART FRONTEND - SUDAH DIPERBAIKI ⚡          ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+API URL sudah diperbaiki dari localhost ke 192.168.1.10
+
+═══════════════════════════════════════════════════════════
+
+LANGKAH:
+
+1. STOP FRONTEND
+   ──────────────
+   - Cari window CMD/PowerShell frontend
+   - Tekan Ctrl+C
+   - Ketik: Y
+   - Tunggu sampai berhenti
+
+2. START FRONTEND LAGI
+   ───────────────────
+   Klik 2x: RUN-FRONTEND.bat
+   
+   Tunggu sampai muncul:
+   ➜ Network: http://192.168.1.10:5174
+
+3. CLEAR CACHE HP
+   ──────────────
+   Di browser HP:
+   - Settings → Privacy → Clear browsing data
+   - Pilih "All time"
+   - Clear
+
+4. REFRESH HP
+   ──────────
+   - Buka: http://192.168.1.10:5174
+   - Refresh (F5 atau reload)
+
+5. LOGIN
+   ─────
+   Sekarang login harus sudah bisa! 🎉
+
+═══════════════════════════════════════════════════════════
+
+✅ YANG SUDAH DIPERBAIKI:
+
+1. API URL default: localhost → 192.168.1.10
+2. Vite cache: sudah di-clear
+3. File .env.production: dibuat
+
+═══════════════════════════════════════════════════════════
+
+⚠️ PENTING:
+
+Jangan lupa STOP frontend yang lama dulu!
+Kalau langsung start tanpa stop, bisa conflict port.
+
+═══════════════════════════════════════════════════════════
+
+🎯 SETELAH RESTART:
+
+Cek di browser HP console atau CMD frontend:
+Harus muncul: 🌐 API URL: http://192.168.1.10:3002/api
+
+Bukan: 🌐 API URL: http://localhost:3002/api ❌
+
+═══════════════════════════════════════════════════════════
+
+Done! Tinggal restart frontend dan login di HP! 🚀
