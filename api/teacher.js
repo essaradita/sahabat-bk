@@ -13,24 +13,6 @@ function verifyTeacher(req) {
   return decoded
 }
 
-// Helper to get request body
-async function getBody(req) {
-  if (req.body) return req.body
-  
-  return new Promise((resolve, reject) => {
-    let data = ''
-    req.on('data', chunk => { data += chunk })
-    req.on('end', () => {
-      try {
-        resolve(data ? JSON.parse(data) : {})
-      } catch (e) {
-        reject(e)
-      }
-    })
-    req.on('error', reject)
-  })
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
@@ -38,14 +20,11 @@ export default async function handler(req, res) {
   
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const { pathname } = new URL(req.url, `http://${req.headers.host}`)
+  const pathname = req.url.split('?')[0]
   const pathParts = pathname.split('/').filter(Boolean)
   
-  // Parse body for POST/PUT requests
-  let body = {}
-  if (req.method === 'POST' || req.method === 'PUT') {
-    body = await getBody(req)
-  }
+  // Vercel automatically parses body
+  const body = req.body || {}
 
   try {
     verifyTeacher(req)

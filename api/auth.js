@@ -9,57 +9,32 @@ function generateToken(userId, role) {
   return jwt.sign({ userId, role }, process.env.JWT_SECRET, { expiresIn: '7d' })
 }
 
-// Helper to get request body (Vercel serverless parses it automatically)
-async function getBody(req) {
-  // Vercel automatically parses body for us
-  if (req.body) return req.body
-  
-  // Fallback: manual parsing
-  return new Promise((resolve, reject) => {
-    let data = ''
-    req.on('data', chunk => { data += chunk })
-    req.on('end', () => {
-      try {
-        resolve(data ? JSON.parse(data) : {})
-      } catch (e) {
-        reject(e)
-      }
-    })
-    req.on('error', reject)
-  })
-}
-
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   
-  if (req.method === 'OPTIONS') return res.status(200).end()
-
-  // Get pathname - handle both full URL and path-only
-  let pathname = req.url
-  try {
-    const url = new URL(req.url, `http://${req.headers.host}`)
-    pathname = url.pathname
-  } catch {
-    // If req.url is already just a path
-    pathname = req.url.split('?')[0]
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
   }
 
-  console.log('🔍 Auth endpoint:', req.method, pathname)
+  // Get pathname - Vercel provides clean req.url
+  const pathname = req.url.split('?')[0]
   
-  // Parse body for POST requests
-  let body = {}
-  if (req.method === 'POST') {
-    body = await getBody(req)
-    console.log('📦 Request body keys:', Object.keys(body))
-  }
+  console.log('🔍 Auth Request:', req.method, pathname)
+  console.log('📦 Body type:', typeof req.body, req.body ? Object.keys(req.body) : 'no body')
+
+  // Vercel automatically parses body, but we store it in a variable for clarity
+  const body = req.body || {}
 
   try {
-    // POST /api/auth/register/student (support both / and -)
-    if ((pathname === '/api/auth/register-student' || pathname === '/api/auth/register/student' || pathname.endsWith('/register/student')) && req.method === 'POST') {
-      console.log('✅ Register student matched')
+    // POST /api/auth/register/student
+    if (pathname.includes('/register/student') && req.method === 'POST') {
+      console.log('✅ Register student endpoint hit')
       const { name, username, password, kelas, gender } = body
+      
+      console.log('📥 Received data:', { name, username, kelas, gender, hasPassword: !!password })
 
       if (!name || !username || !password || !kelas) {
         return res.status(400).json({ error: 'Semua field wajib diisi' })
@@ -101,9 +76,9 @@ export default async function handler(req, res) {
       })
     }
 
-    // POST /api/auth/register/teacher (support both / and -)
-    if ((pathname === '/api/auth/register-teacher' || pathname === '/api/auth/register/teacher' || pathname.endsWith('/register/teacher')) && req.method === 'POST') {
-      console.log('✅ Register teacher matched')
+    // POST /api/auth/register/teacher
+    if (pathname.includes('/register/teacher') && req.method === 'POST') {
+      console.log('✅ Register teacher endpoint hit')
       const { name, email, password, school } = body
 
       if (!name || !email || !password || !school) {
@@ -138,9 +113,9 @@ export default async function handler(req, res) {
       })
     }
 
-    // POST /api/auth/login/student (support both / and -)
-    if ((pathname === '/api/auth/login-student' || pathname === '/api/auth/login/student' || pathname.endsWith('/login/student')) && req.method === 'POST') {
-      console.log('✅ Login student matched')
+    // POST /api/auth/login/student
+    if (pathname.includes('/login/student') && req.method === 'POST') {
+      console.log('✅ Login student endpoint hit')
       const { username, password } = body
 
       if (!username || !password) {
@@ -184,9 +159,9 @@ export default async function handler(req, res) {
       })
     }
 
-    // POST /api/auth/login/teacher (support both / and -)
-    if ((pathname === '/api/auth/login-teacher' || pathname === '/api/auth/login/teacher' || pathname.endsWith('/login/teacher')) && req.method === 'POST') {
-      console.log('✅ Login teacher matched')
+    // POST /api/auth/login/teacher
+    if (pathname.includes('/login/teacher') && req.method === 'POST') {
+      console.log('✅ Login teacher endpoint hit')
       const { email, password } = body
 
       if (!email || !password) {
@@ -225,7 +200,7 @@ export default async function handler(req, res) {
     }
 
     // GET /api/auth/profile
-    if (pathname === '/api/auth/profile' && req.method === 'GET') {
+    if (pathname.includes('/profile') && req.method === 'GET') {
       const token = req.headers.authorization?.split(' ')[1]
       if (!token) return res.status(401).json({ error: 'Token tidak ditemukan' })
       
