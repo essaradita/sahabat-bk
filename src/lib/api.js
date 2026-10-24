@@ -1,8 +1,10 @@
-// API Client untuk MySQL Backend
-// Auto-detect: Use IP address for network access, localhost for local development
+// API Client untuk Vercel Full-Stack Serverless
+// Production: API served from /api routes (same domain, no port)
+// Development: localhost:3002 or environment variable
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-const API_BASE = isLocalhost ? 'http://localhost:3002' : `http://${window.location.hostname}:3002`
-const API_URL = import.meta.env.VITE_API_URL || `${API_BASE}/api`
+const API_URL = isLocalhost 
+  ? (import.meta.env.VITE_API_URL || 'http://localhost:3002/api')
+  : '/api' // Vercel production: relative path to serverless functions
 
 console.log('🌐 API URL:', API_URL)
 console.log('🌐 Environment:', import.meta.env.MODE)
