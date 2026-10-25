@@ -356,7 +356,13 @@ export default function AttendancePage() {
           {/* Student list */}
           <div className="space-y-2 mb-4">
             {records.map(record => {
-              const cfg = record.status ? statusConfig[record.status] : { label: 'Belum diabsen', color: 'bg-slate-100 text-slate-600 border-slate-300', dot: 'bg-slate-400' }
+              const currentStatus = record.status
+              const cfg = currentStatus ? statusConfig[currentStatus] : { 
+                label: 'Belum diabsen', 
+                color: 'bg-slate-100 text-slate-600 border-slate-300', 
+                dot: 'bg-slate-400' 
+              }
+              
               return (
                 <div key={record.id} className="card p-3 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm shrink-0">
@@ -372,25 +378,73 @@ export default function AttendancePage() {
 
                   {/* Status buttons */}
                   <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
-                    {Object.entries(statusConfig).map(([key, c]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          updateStatus(record.id, key)
-                        }}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                          record.status === key
-                            ? `${c.color} shadow-sm`
-                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                        style={{ pointerEvents: 'auto', userSelect: 'none' }}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
+                    {/* Hadir */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        updateStatus(record.id, 'hadir')
+                      }}
+                      className={
+                        currentStatus === 'hadir'
+                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm'
+                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }
+                    >
+                      Hadir
+                    </button>
+                    
+                    {/* Izin */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        updateStatus(record.id, 'izin')
+                      }}
+                      className={
+                        currentStatus === 'izin'
+                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
+                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }
+                    >
+                      Izin
+                    </button>
+                    
+                    {/* Sakit */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        updateStatus(record.id, 'sakit')
+                      }}
+                      className={
+                        currentStatus === 'sakit'
+                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-amber-100 text-amber-700 border-amber-300 shadow-sm'
+                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }
+                    >
+                      Sakit
+                    </button>
+                    
+                    {/* Alpa */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        updateStatus(record.id, 'alpa')
+                      }}
+                      className={
+                        currentStatus === 'alpa'
+                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-red-100 text-red-700 border-red-300 shadow-sm'
+                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }
+                    >
+                      Alpa
+                    </button>
                   </div>
                 </div>
               )
