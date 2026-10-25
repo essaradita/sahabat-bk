@@ -1,0 +1,161 @@
+================================================================================
+🔧 FIX: Bank Soal Kelompok - Edit & Hapus Tidak Berfungsi
+================================================================================
+
+MASALAH:
+- Tombol Edit dan Hapus di Bank Soal Kelompok tidak berfungsi
+- Error: "404 Studi kasus tidak ditemukan"
+
+PENYEBAB:
+- Case studies dengan ID case-1, case-2, case-3 tidak ada di database
+- Frontend menampilkan data hardcoded, tapi API mencari di database
+
+SOLUSI:
+Insert default case studies ke database PostgreSQL di Neon.tech
+
+================================================================================
+📋 LANGKAH-LANGKAH FIX
+================================================================================
+
+STEP 1: Login ke Neon.tech Dashboard
+--------------------------------------
+1. Buka https://neon.tech
+2. Login dengan akun kamu
+3. Pilih project "SAHABAT BK" (atau nama project database kamu)
+4. Klik tab "SQL Editor"
+
+STEP 2: Run SQL Script
+--------------------------------------
+1. Copy SEMUA isi file: database/seed_case_studies.sql
+2. Paste ke SQL Editor di Neon.tech
+3. Klik tombol "Run" atau tekan Ctrl+Enter
+4. Tunggu sampai muncul "Query executed successfully"
+5. Verify: Scroll ke bawah, lihat hasil query SELECT
+   - Harus muncul 3 rows: case-1, case-2, case-3
+
+STEP 3: Test di Website
+--------------------------------------
+1. Refresh halaman Bank Soal Kelompok
+2. Test tombol Edit:
+   - Klik tombol "Edit" pada salah satu case study
+   - Harus redirect ke halaman edit
+   - Harus muncul form dengan data yang sudah terisi
+   
+3. Test tombol Hapus:
+   - Klik tombol "Hapus" (icon trash)
+   - Harus muncul konfirmasi "Yakin ingin menghapus?"
+   - Klik OK
+   - Case study harus hilang dari list
+   - Muncul alert "Studi kasus berhasil dihapus!"
+
+4. Test tombol Buat:
+   - Klik tombol "Buat Studi Kasus"
+   - Isi form dengan data baru
+   - Klik "Simpan"
+   - Harus muncul di list dengan data yang baru
+
+================================================================================
+✅ EXPECTED RESULT SETELAH FIX
+================================================================================
+
+EDIT Button:
+✅ Klik Edit → Redirect ke /teacher/case-studies/edit/case-1
+✅ Form terisi dengan data case study
+✅ Bisa ubah title, description, category, story, dll
+✅ Klik "Update" → Data tersimpan
+✅ Alert "Studi kasus berhasil diupdate!"
+✅ Redirect kembali ke list
+
+DELETE Button:
+✅ Klik Hapus → Muncul konfirmasi
+✅ Klik OK → Case study terhapus dari list
+✅ Alert "Studi kasus berhasil dihapus!"
+✅ Data hilang dari database
+
+CREATE Button:
+✅ Klik "Buat Studi Kasus" → Redirect ke form
+✅ Isi form → Klik "Simpan"
+✅ Alert "Studi kasus berhasil dibuat!"
+✅ Muncul di list dengan status "Aktif"
+
+DUPLICATE Button:
+✅ Klik icon Copy → Case study diduplikasi
+✅ Muncul entry baru dengan judul "(Copy)"
+✅ Alert "Studi kasus berhasil diduplikasi!"
+
+================================================================================
+🐛 TROUBLESHOOTING
+================================================================================
+
+Error: "Studi kasus tidak ditemukan" (masih terjadi setelah run SQL)
+---------------------------------------------------------------------
+Solution:
+1. Check apakah SQL sudah benar-benar ter-execute:
+   - Run query: SELECT * FROM case_studies WHERE id IN ('case-1', 'case-2', 'case-3');
+   - Harus return 3 rows
+   
+2. Jika tidak ada data:
+   - Check connection string POSTGRES_URL di Vercel
+   - Pastikan pointing ke database yang benar
+   
+3. Clear browser cache dan refresh
+
+Error: "Failed to load resource: 404" di console
+---------------------------------------------------------------------
+Solution:
+1. Check Vercel deployment status
+2. Wait 1-2 minutes untuk deployment selesai
+3. Refresh page
+
+Error: "Database connection failed"
+---------------------------------------------------------------------
+Solution:
+1. Check POSTGRES_URL di Vercel environment variables
+2. Check database status di Neon.tech dashboard
+3. Restart database jika suspended
+
+================================================================================
+📝 SQL SCRIPT CONTENT
+================================================================================
+
+File: database/seed_case_studies.sql
+
+INSERT INTO case_studies (id, title, description, category, story, missions_count, status)
+VALUES 
+  (
+    'case-1',
+    'Rani dan Presentasi',
+    'Rani ditunjuk untuk mempresentasikan hasil diskusi kelompok...',
+    'Kepercayaan Diri',
+    'Rani adalah siswa kelas 7 yang pintar dan rajin belajar...',
+    4,
+    'active'
+  ),
+  (
+    'case-2',
+    'Budi dan Tugas Kelompok',
+    'Budi merasa kesal karena dalam tugas kelompok, hanya dia yang bekerja...',
+    'Kerja Sama',
+    'Budi adalah siswa yang bertanggung jawab...',
+    4,
+    'active'
+  ),
+  (
+    'case-3',
+    'Siti dan Pertemanan',
+    'Siti tidak diajak bermain oleh teman-temannya...',
+    'Sosial Emosional',
+    'Siti adalah siswa baru di kelas 7B...',
+    4,
+    'active'
+  )
+ON CONFLICT (id) DO NOTHING;
+
+================================================================================
+✨ DONE!
+================================================================================
+
+Setelah run SQL script, semua fungsi Edit, Hapus, dan Buat di Bank Soal Kelompok
+akan berfungsi dengan baik!
+
+Jika masih ada masalah, screenshot error message dan kasih tahu saya.
