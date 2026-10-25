@@ -3,13 +3,19 @@ import { useAuth } from '../../hooks/useAuth'
 import { useMissionProgress } from '../../hooks/useMissionProgress'
 import { demoStudent, demoBadges, demoWorlds } from '../../data/demoData'
 import AvatarDisplay from '../../components/ui/AvatarDisplay'
-import { Bell, Map, BookOpen, User } from 'lucide-react'
+import { Bell, Map, BookOpen, User, RotateCcw, AlertTriangle } from 'lucide-react'
+import { apiClient } from '../../lib/api'
+import { useState } from 'react'
 
 export default function StudentDashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const { profile } = useAuth()
-  const { missions, loading: loadingMissions } = useMissionProgress()
+  const { missions, loading: loadingMissions, refetch } = useMissionProgress()
+  
+  const [showResetDialog, setShowResetDialog] = useState(false)
+  const [resetXP, setResetXP] = useState(false)
+  const [resetting, setResetting] = useState(false)
   
   // Check if in preview mode
   const isPreviewMode = sessionStorage.getItem('teacher_preview_mode') === 'true'
@@ -26,6 +32,30 @@ export default function StudentDashboard() {
 
   // Hitung progress XP
   const xpProgress = Math.round((student.xp / student.xpMax) * 100)
+
+  const handleResetProgress = async () => {
+    try {
+      setResetting(true)
+      const result = await apiClient.resetProgress(resetXP)
+      
+      alert(`✅ ${result.message}\n\nSemua misi kembali ke awal dan soal akan diambil dari bank soal terbaru!`)
+      
+      // Refresh missions
+      await refetch()
+      
+      // Reload page to update XP/level if resetXP was true
+      if (resetXP) {
+        window.location.reload()
+      }
+      
+      setShowResetDialog(false)
+      setResetXP(false)
+    } catch (err) {
+      alert('❌ Gagal mereset progress: ' + err.message)
+    } finally {
+      setResetting(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-20">
@@ -180,6 +210,22 @@ export default function StudentDashboard() {
           </button>
         </div>
 
+        {/* Reset Progress Button - Only show if there are completed missions */}
+        {completedCount > 0 && !isPreviewMode && (
+          <div className="mb-5 lg:mb-8">
+            <button
+              onClick={() => setShowResetDialog(true)}
+              className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-2xl lg:rounded-3xl p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 lg:gap-3"
+            >
+              <RotateCcw size={20} className="lg:w-6 lg:h-6" />
+              <div className="text-left">
+                <p className="font-black text-sm lg:text-base">Reset Progress & Ulangi Misi</p>
+                <p className="text-xs lg:text-sm text-white/90 font-medium">Mulai dari awal dengan soal terbaru</p>
+              </div>
+            </button>
+          </div>
+        )}
+
         {/* Misi Terbaru */}
         <div className="mb-5 lg:mb-8">
           <div className="flex items-center justify-between mb-2.5 lg:mb-4">
@@ -268,6 +314,86 @@ export default function StudentDashboard() {
         </div>
 
       </div>
+
+      {/* Reset Progress Dialog */}
+      {showResetDialog && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                <AlertTriangle size={24} className="text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-800">Reset Progress?</h3>
+                <p className="text-sm text-slate-500">Tindakan ini tidak dapat dibatalkan</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 rounded-2xl p-4 mb-4">
+              <p className="text-sm text-slate-700 mb-3">
+                <strong>Yang akan terjadi:</strong>
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600">
+                <li className="flex items-start gap-2">
+                  <span className="text-orange-500 mt-0.5">•</span>
+                  <span>Semua progress misi akan dihapus</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-orange-500 mt-0.5">•</span>
+                  <span>Semua misi kembali belum selesai</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">✓</span>
+                  <span>Soal akan diambil dari bank soal terbaru guru</span>
+                </li>
+              </ul>
+            </div>
+
+            <label className="flex items-center gap-3 p-3 bg-red-50 rounded-xl mb-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={resetXP}
+                onChange={(e) => setResetXP(e.target.checked)}
+                className="w-5 h-5 rounded border-red-300 text-red-600 focus:ring-red-500"
+              />
+              <div className="flex-1">
+                <p className="text-sm font-bold text-red-700">Reset XP, Level & Koin</p>
+                <p className="text-xs text-red-600">Kembali ke level 1 dengan 0 XP dan 0 koin</p>
+              </div>
+            </label>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowResetDialog(false)
+                  setResetXP(false)
+                }}
+                disabled={resetting}
+                className="flex-1 px-4 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleResetProgress}
+                disabled={resetting}
+                className="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {resetting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Mereset...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw size={18} />
+                    <span>Ya, Reset!</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
