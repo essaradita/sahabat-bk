@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { apiClient } from '../../lib/api'
 import { useToast } from '../../components/ui/Toast'
-import { Calendar, Download, Save, CheckCircle, Users, Loader2 } from 'lucide-react'
+import { Calendar, Download, Save, CheckCircle, Users, Loader2, FileText } from 'lucide-react'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 
 const statusConfig = {
   hadir: { label: 'Hadir', color: 'bg-emerald-100 text-emerald-700 border-emerald-300', dot: 'bg-emerald-500' },
@@ -165,6 +167,145 @@ export default function AttendancePage() {
     toast('File CSV berhasil diunduh!', 'success')
   }
 
+  function handleDownloadPDFHarian() {
+    if (records.length === 0) {
+      toast('Tidak ada data untuk diunduh', 'error')
+      return
+    }
+
+    const doc = new jsPDF()
+    
+    // Header
+    doc.setFontSize(18)
+    doc.setFont(undefined, 'bold')
+    doc.text('LAPORAN ABSENSI HARIAN', 105, 20, { align: 'center' })
+    
+    doc.setFontSize(12)
+    doc.setFont(undefined, 'normal')
+    doc.text(`Kelas: ${selectedClass}`, 14, 35)
+    doc.text(`Tanggal: ${new Date(selectedDate).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 42)
+    
+    // Summary
+    doc.setFontSize(10)
+    doc.text(`Hadir: ${summary.hadir}  |  Izin: ${summary.izin}  |  Sakit: ${summary.sakit}  |  Alpa: ${summary.alpa}  |  Belum Diabsen: ${summary.belumDiabsen}`, 14, 52)
+    
+    // Table
+    const tableData = records.map((r, i) => [
+      i + 1,
+      r.studentName,
+      r.kelas,
+      r.status ? statusConfig[r.status].label : 'Belum diabsen'
+    ])
+    
+    doc.autoTable({
+      startY: 58,
+      head: [['No', 'Nama Siswa', 'Kelas', 'Status']],
+      body: tableData,
+      headStyles: { fillColor: [59, 130, 246], fontSize: 10, fontStyle: 'bold' },
+      styles: { fontSize: 9 },
+      alternateRowStyles: { fillColor: [245, 247, 250] }
+    })
+    
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.text(`Halaman ${i} dari ${pageCount}`, 105, doc.internal.pageSize.height - 10, { align: 'center' })
+      doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, 14, doc.internal.pageSize.height - 10)
+    }
+    
+    doc.save(`Absensi_Harian_${selectedClass}_${selectedDate}.pdf`)
+    toast('PDF Harian berhasil diunduh!', 'success')
+  }
+
+  function handleDownloadPDFBulanan() {
+    const dates = new Set()
+    const studentsToCheck = selectedClass === 'semua' 
+      ? attendanceStudents 
+      : attendanceStudents.filter(s => s.kelas === selectedClass)
+    
+    // Collect all dates from selected month
+    const [year, month] = selectedDate.split('-')
+    studentsToCheck.forEach(student => {
+      student.attendance?.forEach(a => {
+        const [aYear, aMonth] = a.date.split('-')
+        if (aYear === year && aMonth === month) {
+          dates.add(a.date)
+        }
+      })
+    })
+    
+    if (dates.size === 0) {
+      toast('Tidak ada data absensi bulan ini', 'error')
+      return
+    }
+    
+    const doc = new jsPDF('landscape')
+    
+    // Header
+    doc.setFontSize(18)
+    doc.setFont(undefined, 'bold')
+    doc.text('LAPORAN ABSENSI BULANAN', 148, 15, { align: 'center' })
+    
+    doc.setFontSize(12)
+    doc.setFont(undefined, 'normal')
+    doc.text(`Kelas: ${selectedClass}`, 14, 25)
+    doc.text(`Bulan: ${new Date(selectedDate).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`, 14, 32)
+    
+    // Create table data
+    const sortedDates = Array.from(dates).sort()
+    const tableData = []
+    
+    studentsToCheck.forEach((student, idx) => {
+      const row = [idx + 1, student.name]
+      
+      let totalHadir = 0, totalIzin = 0, totalSakit = 0, totalAlpa = 0
+      
+      sortedDates.forEach(date => {
+        const record = student.attendance?.find(a => a.date === date)
+        const status = record?.status || '-'
+        row.push(status === 'hadir' ? 'H' : status === 'izin' ? 'I' : status === 'sakit' ? 'S' : status === 'alpa' ? 'A' : '-')
+        
+        if (status === 'hadir') totalHadir++
+        if (status === 'izin') totalIzin++
+        if (status === 'sakit') totalSakit++
+        if (status === 'alpa') totalAlpa++
+      })
+      
+      row.push(totalHadir, totalIzin, totalSakit, totalAlpa)
+      tableData.push(row)
+    })
+    
+    // Table headers
+    const headers = ['No', 'Nama Siswa', ...sortedDates.map(d => new Date(d).getDate()), 'H', 'I', 'S', 'A']
+    
+    doc.autoTable({
+      startY: 38,
+      head: [headers],
+      body: tableData,
+      headStyles: { fillColor: [59, 130, 246], fontSize: 8, fontStyle: 'bold' },
+      styles: { fontSize: 7, cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 10 },
+        1: { cellWidth: 40 }
+      },
+      alternateRowStyles: { fillColor: [245, 247, 250] }
+    })
+    
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.text(`Halaman ${i} dari ${pageCount}`, 148, doc.internal.pageSize.height - 10, { align: 'center' })
+      doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, 14, doc.internal.pageSize.height - 10)
+    }
+    
+    doc.save(`Absensi_Bulanan_${selectedClass}_${year}-${month}.pdf`)
+    toast('PDF Bulanan berhasil diunduh!', 'success')
+  }
+
   function markAllPresent() {
     setRecords(prev => prev.map(r => ({ ...r, status: 'hadir' })))
     setSaved(false)
@@ -254,13 +395,29 @@ export default function AttendancePage() {
           <h1 className="text-2xl font-black text-slate-800">Absensi Digital</h1>
           <p className="text-slate-500 text-sm">Catat kehadiran siswa dengan mudah</p>
         </div>
-        <button
-          onClick={handleDownloadCSV}
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all"
-        >
-          <Download size={16} />
-          Unduh CSV
-        </button>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={handleDownloadPDFHarian}
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all"
+          >
+            <FileText size={16} />
+            PDF Harian
+          </button>
+          <button
+            onClick={handleDownloadPDFBulanan}
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm transition-all"
+          >
+            <FileText size={16} />
+            PDF Bulanan
+          </button>
+          <button
+            onClick={handleDownloadCSV}
+            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all"
+          >
+            <Download size={16} />
+            CSV
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
