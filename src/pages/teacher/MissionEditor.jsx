@@ -523,6 +523,8 @@ export default function MissionEditor() {
           </button>
         </div>
       )}
+        </>
+      )}
     </div>
   )
 }
