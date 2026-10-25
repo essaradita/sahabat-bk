@@ -1,0 +1,138 @@
+========================================
+🚀 DEPLOY BANK SOAL FIX - IKUTI URUTAN INI
+========================================
+
+✅ STEP 1: BUAT TABEL QUESTIONS DI DATABASE
+-------------------------------------------
+1. Buka https://console.neon.tech
+2. Login
+3. Pilih project "sahabat-bk"
+4. Klik tab "SQL Editor" (kiri)
+5. Copy SEMUA ISI file: database/schema_mission_questions.sql
+6. Paste ke SQL Editor
+7. Klik tombol "Run" (hijau)
+8. ✅ Harus muncul: "CREATE TABLE" dan "CREATE INDEX"
+9. ⚠️ Jika error "already exists" → SKIP, table sudah ada
+
+✅ STEP 2: ISI DATA SOAL DEMO
+-------------------------------------------
+1. Masih di SQL Editor Neon.tech
+2. Copy SEMUA ISI file: database/seed_mission_questions.sql
+3. Paste ke SQL Editor
+4. Klik tombol "Run"
+5. ✅ Harus muncul: "INSERT 0 8" (8 baris berhasil diinsert)
+6. ⚠️ Jika error "duplicate key" → SKIP, data sudah ada
+
+✅ STEP 3: VERIFIKASI DATA MASUK
+-------------------------------------------
+1. Masih di SQL Editor
+2. Jalankan query ini:
+
+   SELECT mission_id, COUNT(*) as jumlah_soal 
+   FROM mission_questions 
+   GROUP BY mission_id;
+
+3. ✅ Hasil yang BENAR:
+   
+   mission-1 | 5
+   mission-2 | 3
+
+4. ⚠️ Jika kosong → Ulangi STEP 2
+
+✅ STEP 4: TUNGGU VERCEL DEPLOY
+-------------------------------------------
+1. Buka https://vercel.com/dashboard
+2. Pilih project "sahabat-bk"
+3. Tab "Deployments"
+4. ✅ Harus ada deployment BARU dengan commit:
+   "fix: Bank Soal questions now persist to database..."
+5. Status: "Building..." → Tunggu 1-2 menit
+6. ✅ Status berubah jadi "Ready" dengan centang hijau
+7. ⚠️ Jika "Failed" → Klik deployment → Lihat error log
+
+✅ STEP 5: TEST DI WEBSITE
+-------------------------------------------
+WAJIB REFRESH HALAMAN! (Ctrl+F5 atau Cmd+Shift+R)
+
+TEST GURU:
+1. Login sebagai guru
+2. Buka "Bank Soal"
+3. Klik "Edit" pada mission "Detektif Emosi"
+4. ✅ Harus muncul LOADING spinner dulu
+5. ✅ Setelah loading, harus muncul 5 SOAL
+6. Klik "Tambah Soal"
+7. Isi soal test baru
+8. Klik "Simpan Draft"
+9. ✅ Popup: "Draft tersimpan! 6 soal berhasil disimpan"
+10. Refresh halaman (F5)
+11. ✅ Soal baru HARUS TETAP ADA (6 soal)
+
+TEST SISWA:
+1. Login sebagai siswa
+2. Buka "Peta Petualangan"
+3. Klik mission "Detektif Emosi"
+4. Klik "Mulai Misi"
+5. ✅ Harus muncul 6 SOAL (yang baru ditambah guru)
+6. ✅ Soal harus sama persis dengan yang guru edit
+
+========================================
+🔍 TROUBLESHOOTING
+========================================
+
+❌ MASALAH: Soal tidak tersimpan
+SOLUSI:
+- Buka Console browser (F12)
+- Tab "Network"
+- Coba save soal lagi
+- Cari request: "questions"
+- Status harus 200, bukan 404/500
+- Jika 404 → Deployment belum selesai, tunggu lagi
+- Jika 500 → Ada error di server, cek Vercel logs
+
+❌ MASALAH: Siswa tidak lihat soal baru
+SOLUSI:
+- Pastikan guru sudah klik "PUBLIKASIKAN" (bukan cuma Simpan Draft)
+- Siswa HARUS refresh halaman (Ctrl+F5)
+- Cek console browser siswa, lihat error apa
+
+❌ MASALAH: Loading terus menerus
+SOLUSI:
+- Tunggu 10 detik
+- Jika masih loading → Ada error API
+- Cek console browser (F12) → Tab "Console"
+- Screenshot error, kirim ke developer
+
+❌ MASALAH: Vercel deployment failed
+SOLUSI:
+- Klik deployment yang failed
+- Scroll ke bawah, lihat error log
+- Biasanya: environment variable kurang
+- Cek POSTGRES_URL dan JWT_SECRET sudah diset
+
+========================================
+📞 KONTAK JIKA MASIH ERROR
+========================================
+
+Kirim screenshot dari:
+1. SQL Editor hasil query (STEP 3)
+2. Vercel deployment status
+3. Browser Console (F12) saat save soal
+4. Network tab (F12) request "questions"
+
+Dengan info lengkap, bisa dibantu troubleshoot lebih cepat!
+
+========================================
+✅ CHECKLIST SUKSES
+========================================
+
+☐ Tabel mission_questions berhasil dibuat
+☐ 8 baris soal demo berhasil diinsert
+☐ Query verification tampil mission-1: 5, mission-2: 3
+☐ Vercel deployment status "Ready"
+☐ Guru bisa tambah soal dan tersimpan setelah refresh
+☐ Siswa bisa lihat soal yang guru tambahkan
+☐ Jumlah soal di Bank Soal tampil benar
+
+Jika SEMUA centang ✅ → PERBAIKAN BERHASIL! 🎉
+
+========================================
