@@ -60,7 +60,6 @@ export default async function handler(req, res) {
 
       return res.json(studentsWithStats)
     }
-    }
 
     // GET /api/teacher/missions
     if (pathname === '/api/teacher/missions' && req.method === 'GET') {
