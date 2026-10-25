@@ -31,17 +31,22 @@ export default async function handler(req, res) {
 
     // GET /api/student/missions
     if (pathname === '/api/student/missions' && req.method === 'GET') {
+      console.log('📋 Getting student missions for:', studentId)
+      
       const missionProgress = await query(
         'SELECT mission_id, status, score, completed_at FROM mission_progress WHERE student_id = $1',
         [studentId]
       )
 
+      console.log('📊 Mission progress from DB:', missionProgress)
       return res.json(missionProgress)
     }
 
     // POST /api/student/missions/complete
     if (pathname === '/api/student/missions/complete' && req.method === 'POST') {
       const { missionId, score, xpReward, coinReward } = body
+
+      console.log('🎯 Complete mission request:', { studentId, missionId, score, xpReward, coinReward })
 
       if (!missionId) {
         return res.status(400).json({ error: 'Mission ID required' })
@@ -52,7 +57,10 @@ export default async function handler(req, res) {
         [studentId, missionId]
       )
 
+      console.log('🔍 Existing progress:', existing)
+
       if (existing.length > 0) {
+        console.log('📝 Updating existing mission progress...')
         await query(
           `UPDATE mission_progress 
            SET status = 'completed', score = $1, completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
@@ -60,6 +68,7 @@ export default async function handler(req, res) {
           [score || 100, studentId, missionId]
         )
       } else {
+        console.log('📝 Inserting new mission progress...')
         await query(
           `INSERT INTO mission_progress (id, student_id, mission_id, status, score, completed_at)
            VALUES ($1, $2, $3, 'completed', $4, CURRENT_TIMESTAMP)`,
@@ -67,6 +76,7 @@ export default async function handler(req, res) {
         )
       }
 
+      console.log('💰 Updating student progress (XP + coins)...')
       await query(
         `UPDATE student_progress 
          SET xp = xp + $1, coins = coins + $2, updated_at = CURRENT_TIMESTAMP
@@ -76,6 +86,7 @@ export default async function handler(req, res) {
 
       const updatedProgress = await query('SELECT * FROM student_progress WHERE student_id = $1', [studentId])
 
+      console.log('✅ Mission completed successfully!', updatedProgress[0])
       return res.json({
         success: true,
         message: 'Misi berhasil diselesaikan!',
