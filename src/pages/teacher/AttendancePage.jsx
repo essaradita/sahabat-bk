@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { apiClient } from '../../lib/api'
 import { useToast } from '../../components/ui/Toast'
-import { Calendar, Download, Plus, Save, CheckCircle, Users, Loader2 } from 'lucide-react'
+import { Calendar, Download, Save, CheckCircle, Users, Loader2 } from 'lucide-react'
 
 const statusConfig = {
   hadir: { label: 'Hadir', color: 'bg-emerald-100 text-emerald-700 border-emerald-300', dot: 'bg-emerald-500' },
@@ -49,10 +49,12 @@ export default function AttendancePage() {
     ? [...new Set(attendanceStudents.map(s => s.kelas).filter(Boolean))]
     : []
 
-  // Filter students by class
-  const filteredStudents = selectedClass === 'semua' 
-    ? attendanceStudents 
-    : attendanceStudents.filter(s => s.kelas === selectedClass)
+  // Filter students by class - memoized to prevent unnecessary re-renders
+  const filteredStudents = useMemo(() => {
+    return selectedClass === 'semua' 
+      ? attendanceStudents 
+      : attendanceStudents.filter(s => s.kelas === selectedClass)
+  }, [attendanceStudents, selectedClass])
 
   // Generate records when students, date or class changes
   useEffect(() => {
@@ -75,7 +77,6 @@ export default function AttendancePage() {
     })
 
     setRecords(newRecords)
-    setSaved(false)
   }, [filteredStudents, selectedDate])
 
   // Calculate summary
@@ -238,7 +239,6 @@ export default function AttendancePage() {
             href="/teacher/students"
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all"
           >
-            <Plus size={16} />
             Tambah Siswa Sekarang
           </a>
         </div>
@@ -298,7 +298,10 @@ export default function AttendancePage() {
                 </label>
                 <select
                   value={selectedClass}
-                  onChange={e => setSelectedClass(e.target.value)}
+                  onChange={e => {
+                    setSelectedClass(e.target.value)
+                    setSaved(false)
+                  }}
                   className="input-field"
                 >
                   {classes.map(c => (
@@ -313,7 +316,10 @@ export default function AttendancePage() {
                 <input
                   type="date"
                   value={selectedDate}
-                  onChange={e => setSelectedDate(e.target.value)}
+                  onChange={e => {
+                    setSelectedDate(e.target.value)
+                    setSaved(false)
+                  }}
                   className="input-field"
                 />
               </div>
