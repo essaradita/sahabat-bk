@@ -1,12 +1,26 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { demoMissions, demoWorlds } from '../../data/demoData'
+import { useMissionProgress } from '../../hooks/useMissionProgress'
 import { ArrowLeft, Clock, Zap, Target, Trophy, Lock, Play } from 'lucide-react'
 
 export default function MissionDetail() {
   const { missionId } = useParams()
   const navigate = useNavigate()
-  const mission = demoMissions.find(m => m.id === missionId)
+  const { missions, loading } = useMissionProgress()
+  
+  // Get mission with updated status from hook
+  const mission = missions.find(m => m.id === missionId)
   const world = mission ? demoWorlds.find(w => w.id === mission.worldId) : null
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600">Memuat misi...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!mission) {
     return (
