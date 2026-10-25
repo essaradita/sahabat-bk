@@ -41,13 +41,25 @@ export default async function handler(req, res) {
         ORDER BY p.created_at DESC
       `)
 
-      const studentsWithStats = students.map(student => ({
-        ...student,
-        missionsCompleted: 0,
-        lastActive: student.created_at
-      }))
+      // Hitung misi yang completed untuk setiap siswa
+      const studentsWithStats = await Promise.all(
+        students.map(async (student) => {
+          const completedMissions = await query(
+            `SELECT COUNT(*) as count FROM mission_progress 
+             WHERE student_id = $1 AND status = 'completed'`,
+            [student.id]
+          )
+          
+          return {
+            ...student,
+            missionsCompleted: parseInt(completedMissions[0]?.count || 0),
+            lastActive: student.created_at
+          }
+        })
+      )
 
       return res.json(studentsWithStats)
+    }
     }
 
     // GET /api/teacher/missions
