@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { apiClient } from '../../lib/api'
-import { demoClasses, demoAttendance } from '../../data/demoData'
 import { useToast } from '../../components/ui/Toast'
-import { Calendar, Download, Plus, Save, CheckCircle, X, AlertCircle, Clock, Users, Loader2 } from 'lucide-react'
+import { Calendar, Download, Plus, Save, CheckCircle, Users, Loader2 } from 'lucide-react'
 
 const statusConfig = {
   hadir: { label: 'Hadir', color: 'bg-emerald-100 text-emerald-700 border-emerald-300', dot: 'bg-emerald-500' },
@@ -18,7 +17,7 @@ export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [records, setRecords] = useState([])
   const [saved, setSaved] = useState(false)
-  const [activeTab, setActiveTab] = useState('input') // 'input' | 'recap'
+  const [activeTab, setActiveTab] = useState('input')
   const [loading, setLoading] = useState(true)
 
   // Load students from API
@@ -27,10 +26,8 @@ export default function AttendancePage() {
       try {
         setLoading(true)
         const data = await apiClient.getAttendanceStudents()
-        console.log('Attendance students loaded:', data)
         setAttendanceStudents(data || [])
         
-        // Auto select first class if available
         if (data && data.length > 0) {
           const uniqueClasses = [...new Set(data.map(s => s.kelas).filter(Boolean))]
           if (uniqueClasses.length > 0 && selectedClass === 'semua') {
@@ -38,7 +35,6 @@ export default function AttendancePage() {
           }
         }
       } catch (err) {
-        console.error('Failed to fetch attendance students:', err)
         toast('Gagal memuat data siswa: ' + err.message, 'error')
         setAttendanceStudents([])
       } finally {
@@ -48,17 +44,17 @@ export default function AttendancePage() {
     fetchAttendanceStudents()
   }, [])
 
-  // Get unique classes from students
+  // Get unique classes
   const classes = attendanceStudents.length > 0 
     ? [...new Set(attendanceStudents.map(s => s.kelas).filter(Boolean))]
     : []
 
-  // Filter students by selected class
+  // Filter students by class
   const filteredStudents = selectedClass === 'semua' 
     ? attendanceStudents 
     : attendanceStudents.filter(s => s.kelas === selectedClass)
 
-  // Generate records for current date and class
+  // Generate records when students, date or class changes
   useEffect(() => {
     if (filteredStudents.length === 0) {
       setRecords([])
@@ -66,23 +62,23 @@ export default function AttendancePage() {
     }
 
     const newRecords = filteredStudents.map(student => {
-      // Check if student has attendance record for selected date
       const attendanceRecord = student.attendance?.find(a => a.date === selectedDate)
       
       return {
         id: `${student.id}-${selectedDate}`,
         studentId: student.id,
         studentName: student.name,
-        status: attendanceRecord?.status || null, // null = belum diabsen
+        status: attendanceRecord?.status || null,
         date: selectedDate,
         kelas: student.kelas
       }
     })
 
     setRecords(newRecords)
-    setSaved(false) // Reset saved state when date/class changes
+    setSaved(false)
   }, [filteredStudents, selectedDate])
 
+  // Calculate summary
   const summary = {
     hadir: records.filter(r => r.status === 'hadir').length,
     izin: records.filter(r => r.status === 'izin').length,
@@ -91,45 +87,43 @@ export default function AttendancePage() {
     belumDiabsen: records.filter(r => r.status === null).length,
   }
 
-  function updateStatus(recordId, status) {
-    setRecords(prev => prev.map(r => 
-      r.id === recordId ? { ...r, status } : r
-    ))
+  // Update status handler
+  const handleStatusClick = (recordId, newStatus) => {
+    setRecords(prevRecords => 
+      prevRecords.map(record => 
+        record.id === recordId 
+          ? { ...record, status: newStatus }
+          : record
+      )
+    )
     setSaved(false)
   }
 
+  // Save to database
   function handleSave() {
-    // Validate: at least one status must be set
     const hasAnyStatus = records.some(r => r.status !== null)
     if (!hasAnyStatus) {
       toast('Pilih minimal satu status absensi', 'error')
       return
     }
 
-    // Only save records with status (skip null/belum diabsen)
     const recordsToSave = records.filter(r => r.status !== null)
-    
-    console.log('Saving attendance records:', recordsToSave)
     
     const promises = recordsToSave.map(record => 
       apiClient.markAttendance(record.studentId, selectedDate, record.status)
         .catch(err => {
           console.error(`Failed to mark attendance for ${record.studentName}:`, err)
-          throw err // Propagate error
+          throw err
         })
     )
 
     Promise.all(promises)
       .then(() => {
-        console.log('All attendance saved, fetching updated data...')
-        // Fetch updated data
         return apiClient.getAttendanceStudents()
       })
       .then(updatedStudents => {
-        console.log('Updated students loaded:', updatedStudents)
         setAttendanceStudents(updatedStudents)
         
-        // Update current records with saved data
         const updatedRecords = records.map(record => {
           const student = updatedStudents.find(s => s.id === record.studentId)
           const attendanceRecord = student?.attendance?.find(a => a.date === selectedDate)
@@ -143,11 +137,9 @@ export default function AttendancePage() {
         setSaved(true)
         toast(`Absensi ${recordsToSave.length} siswa berhasil disimpan! ✅`, 'success')
         
-        // Reset saved state after 3 seconds
         setTimeout(() => setSaved(false), 3000)
       })
       .catch(err => {
-        console.error('Save attendance error:', err)
         toast('Gagal menyimpan absensi: ' + err.message, 'error')
       })
   }
@@ -160,7 +152,7 @@ export default function AttendancePage() {
 
     const header = 'No,Nama Siswa,Kelas,Status,Tanggal\n'
     const rows = records.map((r, i) =>
-      `${i + 1},${r.studentName},${r.kelas},${r.status},${selectedDate}`
+      `${i + 1},${r.studentName},${r.kelas},${r.status || 'Belum diabsen'},${selectedDate}`
     ).join('\n')
     const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -172,31 +164,26 @@ export default function AttendancePage() {
     toast('File CSV berhasil diunduh!', 'success')
   }
 
-  // Mark all students present
   function markAllPresent() {
-    console.log('Marking all present')
     setRecords(prev => prev.map(r => ({ ...r, status: 'hadir' })))
     setSaved(false)
   }
 
-  // Get attendance history (for recap tab)
+  // Get attendance history for recap tab
   const getAttendanceHistory = () => {
     const history = []
     const dates = new Set()
     
-    // Only consider students from selected class
     const studentsToCheck = selectedClass === 'semua' 
       ? attendanceStudents 
       : attendanceStudents.filter(s => s.kelas === selectedClass)
     
-    // Collect all unique dates
     studentsToCheck.forEach(student => {
       student.attendance?.forEach(a => {
         dates.add(a.date)
       })
     })
 
-    // Create summary for each date
     Array.from(dates).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
       const dateRecords = studentsToCheck.map(student => {
         const record = student.attendance?.find(a => a.date === date)
@@ -204,7 +191,7 @@ export default function AttendancePage() {
           status: record?.status || null,
           kelas: student.kelas
         }
-      }).filter(r => r.status) // Only count students with attendance record
+      }).filter(r => r.status)
 
       const summary = {
         date,
@@ -223,7 +210,6 @@ export default function AttendancePage() {
 
   const history = getAttendanceHistory()
 
-  // Loading state
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto flex items-center justify-center py-20">
@@ -235,7 +221,6 @@ export default function AttendancePage() {
     )
   }
 
-  // Empty state
   if (attendanceStudents.length === 0) {
     return (
       <div className="max-w-3xl mx-auto">
@@ -282,13 +267,21 @@ export default function AttendancePage() {
       <div className="flex gap-2 mb-5 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200">
         <button
           onClick={() => setActiveTab('input')}
-          className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'input' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
+          className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${
+            activeTab === 'input' 
+              ? 'bg-blue-600 text-white shadow' 
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
         >
           ✏️ Input Absensi
         </button>
         <button
           onClick={() => setActiveTab('recap')}
-          className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recap' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
+          className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${
+            activeTab === 'recap' 
+              ? 'bg-blue-600 text-white shadow' 
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
         >
           📊 Rekap
         </button>
@@ -327,7 +320,7 @@ export default function AttendancePage() {
             </div>
           </div>
 
-          {/* Summary */}
+          {/* Summary Cards */}
           <div className="grid grid-cols-4 gap-2 mb-4">
             {Object.entries(statusConfig).map(([key, cfg]) => (
               <div key={key} className={`rounded-xl p-2.5 border text-center ${cfg.color}`}>
@@ -337,9 +330,12 @@ export default function AttendancePage() {
             ))}
           </div>
 
-          {/* Quick action */}
+          {/* Quick Action */}
           <div className="flex gap-2 mb-3">
-            <button onClick={markAllPresent} className="flex items-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-sm transition-all">
+            <button 
+              onClick={markAllPresent} 
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-sm transition-all"
+            >
               <CheckCircle size={15} />
               Semua Hadir
             </button>
@@ -348,21 +344,19 @@ export default function AttendancePage() {
             </span>
           </div>
 
-          {/* Student list */}
+          {/* Student List */}
           <div className="space-y-2 mb-4">
             {records.map(record => {
-              const currentStatus = record.status
-              const cfg = currentStatus ? statusConfig[currentStatus] : { 
-                label: 'Belum diabsen', 
-                color: 'bg-slate-100 text-slate-600 border-slate-300', 
-                dot: 'bg-slate-400' 
-              }
+              const cfg = record.status 
+                ? statusConfig[record.status] 
+                : { label: 'Belum diabsen', color: 'bg-slate-100 text-slate-600 border-slate-300', dot: 'bg-slate-400' }
               
               return (
                 <div key={record.id} className="card p-3 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm shrink-0">
                     {record.studentName[0]}
                   </div>
+                  
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-slate-800 text-sm">{record.studentName}</p>
                     <div className="flex items-center gap-1 mt-0.5">
@@ -371,13 +365,12 @@ export default function AttendancePage() {
                     </div>
                   </div>
 
-                  {/* Status buttons */}
+                  {/* Status Buttons */}
                   <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
                     <button
-                      type="button"
-                      onClick={() => updateStatus(record.id, 'hadir')}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
-                        currentStatus === 'hadir'
+                      onClick={() => handleStatusClick(record.id, 'hadir')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                        record.status === 'hadir'
                           ? 'bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm'
                           : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                       }`}
@@ -386,10 +379,9 @@ export default function AttendancePage() {
                     </button>
                     
                     <button
-                      type="button"
-                      onClick={() => updateStatus(record.id, 'izin')}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
-                        currentStatus === 'izin'
+                      onClick={() => handleStatusClick(record.id, 'izin')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                        record.status === 'izin'
                           ? 'bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
                           : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                       }`}
@@ -398,10 +390,9 @@ export default function AttendancePage() {
                     </button>
                     
                     <button
-                      type="button"
-                      onClick={() => updateStatus(record.id, 'sakit')}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
-                        currentStatus === 'sakit'
+                      onClick={() => handleStatusClick(record.id, 'sakit')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                        record.status === 'sakit'
                           ? 'bg-amber-100 text-amber-700 border-amber-300 shadow-sm'
                           : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                       }`}
@@ -410,10 +401,9 @@ export default function AttendancePage() {
                     </button>
                     
                     <button
-                      type="button"
-                      onClick={() => updateStatus(record.id, 'alpa')}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
-                        currentStatus === 'alpa'
+                      onClick={() => handleStatusClick(record.id, 'alpa')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                        record.status === 'alpa'
                           ? 'bg-red-100 text-red-700 border-red-300 shadow-sm'
                           : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                       }`}
@@ -426,13 +416,25 @@ export default function AttendancePage() {
             })}
           </div>
 
+          {/* Save Button */}
           <button
-            type="button"
             onClick={handleSave}
             disabled={saved}
-            className={`w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all ${saved ? 'bg-emerald-500 text-white cursor-default' : 'bg-blue-600 hover:bg-blue-700 text-white'} shadow-lg disabled:opacity-90`}
+            className={`w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all ${
+              saved 
+                ? 'bg-emerald-500 text-white cursor-default' 
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            } shadow-lg disabled:opacity-90`}
           >
-            {saved ? <><CheckCircle size={20} /> Absensi Tersimpan</> : <><Save size={20} /> Simpan Absensi</>}
+            {saved ? (
+              <>
+                <CheckCircle size={20} /> Absensi Tersimpan
+              </>
+            ) : (
+              <>
+                <Save size={20} /> Simpan Absensi
+              </>
+            )}
           </button>
         </>
       )}
@@ -454,7 +456,12 @@ export default function AttendancePage() {
                   <div>
                     <h3 className="font-black text-slate-800">Kelas {selectedClass}</h3>
                     <p className="text-slate-500 text-sm">
-                      {new Date(session.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                      {new Date(session.date).toLocaleDateString('id-ID', { 
+                        weekday: 'long', 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                      })}
                     </p>
                   </div>
                   <span className="badge bg-blue-100 text-blue-700">{session.total} siswa</span>
