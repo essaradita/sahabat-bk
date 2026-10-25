@@ -11,7 +11,7 @@ export default function StudentDashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const { profile } = useAuth()
-  const { missions, loading: loadingMissions, refetch } = useMissionProgress()
+  const { missions, loading: loadingMissions, refresh } = useMissionProgress()
   
   const [showResetDialog, setShowResetDialog] = useState(false)
   const [resetXP, setResetXP] = useState(false)
@@ -41,7 +41,7 @@ export default function StudentDashboard() {
       alert(`✅ ${result.message}\n\nSemua misi kembali ke awal dan soal akan diambil dari bank soal terbaru!`)
       
       // Refresh missions
-      await refetch()
+      await refresh()
       
       // Reload page to update XP/level if resetXP was true
       if (resetXP) {
