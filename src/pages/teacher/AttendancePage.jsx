@@ -172,9 +172,9 @@ export default function AttendancePage() {
     }
 
     try {
-      // Dynamic import untuk jsPDF
-      const jsPDF = (await import('jspdf')).default
-      await import('jspdf-autotable')
+      // Dynamic import untuk jsPDF dan autoTable
+      const { default: jsPDF } = await import('jspdf')
+      const { default: autoTable } = await import('jspdf-autotable')
       
       const doc = new jsPDF()
       
@@ -200,7 +200,7 @@ export default function AttendancePage() {
         r.status ? statusConfig[r.status].label : 'Belum diabsen'
       ])
       
-      doc.autoTable({
+      autoTable(doc, {
         startY: 58,
         head: [['No', 'Nama Siswa', 'Kelas', 'Status']],
         body: tableData,
@@ -249,9 +249,9 @@ export default function AttendancePage() {
     }
     
     try {
-      // Dynamic import untuk jsPDF
-      const jsPDF = (await import('jspdf')).default
-      await import('jspdf-autotable')
+      // Dynamic import untuk jsPDF dan autoTable
+      const { default: jsPDF } = await import('jspdf')
+      const { default: autoTable } = await import('jspdf-autotable')
       
       const doc = new jsPDF('landscape')
       
@@ -292,7 +292,7 @@ export default function AttendancePage() {
       // Table headers
       const headers = ['No', 'Nama Siswa', ...sortedDates.map(d => new Date(d).getDate()), 'H', 'I', 'S', 'A']
       
-      doc.autoTable({
+      autoTable(doc, {
         startY: 38,
         head: [headers],
         body: tableData,
