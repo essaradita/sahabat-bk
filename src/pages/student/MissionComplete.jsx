@@ -36,16 +36,29 @@ export default function MissionComplete() {
 
   async function saveMissionCompletion() {
     try {
-      await apiClient.completeMission(
+      console.log('🎯 Saving mission completion:', {
+        missionId,
+        percentage,
+        xp: mission.xpReward,
+        coins: mission.coinReward
+      })
+      
+      const result = await apiClient.completeMission(
         missionId,
         percentage,
         mission.xpReward,
         mission.coinReward
       )
+      
+      console.log('✅ Mission completion saved:', result)
+      
       // Refresh profile to get updated XP and coins
       await refreshProfile()
+      
+      console.log('✅ Profile refreshed')
     } catch (err) {
-      console.error('Failed to save mission completion:', err)
+      console.error('❌ Failed to save mission completion:', err)
+      console.error('Error details:', err.message, err.response)
     }
   }
 
@@ -160,7 +173,10 @@ export default function MissionComplete() {
       {/* Actions */}
       <div className="w-full space-y-3">
         <button
-          onClick={() => navigate('/student/map')}
+          onClick={() => {
+            // Force refresh dengan state untuk trigger reload di AdventureMap
+            navigate('/student/map', { state: { refreshMissions: true } })
+          }}
           className="w-full bg-white text-blue-700 font-black py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl hover:bg-blue-50 transition-all"
         >
           Lanjut ke Misi Berikutnya <ChevronRight size={20} />

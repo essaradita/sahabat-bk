@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+<parameter name="useLocation" />navigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useMissionProgress } from '../../hooks/useMissionProgress'
 import { ArrowLeft, Coins } from 'lucide-react'
@@ -9,9 +9,20 @@ import kunciImg from '../../gambar/kunci.png'
 
 export default function AdventureMap() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { profile } = useAuth()
-  const { missions, loading } = useMissionProgress()
+  const { missions, loading, refresh } = useMissionProgress()
   const [selectedMission, setSelectedMission] = useState(null)
+
+  // Auto-refresh missions jika ada flag dari MissionComplete
+  useEffect(() => {
+    if (location.state?.refreshMissions) {
+      console.log('🔄 Refreshing missions after completion...')
+      refresh()
+      // Clear state setelah refresh
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state, refresh])
 
   // Hitung misi yang completed
   const completedMissions = missions.filter(m => m.status === 'completed')
