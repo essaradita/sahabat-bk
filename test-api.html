@@ -51,9 +51,10 @@
   </div>
 
   <script>
-    const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3002/api' : '/api';
+    // Force use production API (same domain)
+    const API_URL = '/api';
     
-    document.getElementById('env').textContent = `API URL: ${API_URL}\nHostname: ${window.location.hostname}`;
+    document.getElementById('env').textContent = `API URL: ${API_URL}\nHostname: ${window.location.hostname}\nFull URL: ${window.location.origin}${API_URL}`;
 
     async function testHealth() {
       const result = document.getElementById('health-result');
