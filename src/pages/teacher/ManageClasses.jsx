@@ -74,6 +74,7 @@ export default function ManageClasses() {
   const [showForm, setShowForm] = useState(false)
   const [editingClass, setEditingClass] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
+  const [syncing, setSyncing] = useState(false)
   const [form, setForm] = useState({ name: '', grade: '7', teacherName: 'Ibu Rina', studentCount: 0 })
 
   // Load classes from API
@@ -136,9 +137,21 @@ export default function ManageClasses() {
       toast('Nama kelas wajib diisi', 'error')
       return 
     }
+
+    if (!form.teacherName.trim()) { 
+      toast('Nama wali kelas wajib diisi', 'error')
+      return 
+    }
     
     try {
       console.log('Saving class:', form)
+      
+      // Calculate student count from database
+      const students = await apiClient.getStudents()
+      const classNamePattern = form.name.replace('Kelas ', '').trim()
+      const studentCount = students.filter(s => s.kelas === classNamePattern).length
+      
+      console.log(`Auto-synced student count for "${classNamePattern}": ${studentCount}`)
       
       if (editingClass) {
         // Update existing class
@@ -146,7 +159,7 @@ export default function ManageClasses() {
           name: form.name,
           grade: parseInt(form.grade),
           teacherName: form.teacherName,
-          studentCount: form.studentCount
+          studentCount: studentCount
         })
         
         if (result && result.class) {
@@ -159,7 +172,7 @@ export default function ManageClasses() {
           name: form.name,
           grade: parseInt(form.grade),
           teacherName: form.teacherName,
-          studentCount: 0
+          studentCount: studentCount
         })
         
         if (result && result.class) {
@@ -190,6 +203,46 @@ export default function ManageClasses() {
     }
   }
 
+  async function syncAllStudentCounts() {
+    try {
+      setSyncing(true)
+      console.log('Syncing student counts for all classes...')
+      
+      const students = await apiClient.getStudents()
+      const updatedClasses = []
+      
+      for (const cls of classes) {
+        const classNamePattern = cls.name.replace('Kelas ', '').trim()
+        const studentCount = students.filter(s => s.kelas === classNamePattern).length
+        
+        console.log(`Class "${cls.name}" (${classNamePattern}): ${studentCount} students`)
+        
+        // Update class with new count
+        const result = await apiClient.updateClass(cls.id, {
+          name: cls.name,
+          grade: cls.grade,
+          teacherName: cls.teacher_name || cls.teacher || 'Ibu Rina',
+          studentCount: studentCount
+        })
+        
+        if (result && result.class) {
+          updatedClasses.push(result.class)
+        }
+      }
+      
+      // Refresh classes
+      const refreshed = await apiClient.getClasses()
+      setClasses(refreshed)
+      
+      toast(`✅ Sinkronisasi selesai! ${updatedClasses.length} kelas diperbarui`, 'success')
+    } catch (err) {
+      console.error('Sync error:', err)
+      toast('Gagal sinkronisasi: ' + err.message, 'error')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto flex items-center justify-center py-20">
@@ -208,10 +261,23 @@ export default function ManageClasses() {
           <h1 className="text-2xl font-black text-slate-800">Kelola Kelas</h1>
           <p className="text-slate-500 text-sm">{classes.length} kelas aktif</p>
         </div>
-        <button onClick={() => { setEditingClass(null); setForm({ name: '', grade: '7', teacherName: 'Ibu Rina', studentCount: 0 }); setShowForm(true) }} className="btn-primary flex items-center gap-2 py-2.5 px-4 text-sm">
-          <Plus size={18} />
-          Tambah Kelas
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={syncAllStudentCounts} 
+            disabled={syncing}
+            className="flex items-center gap-2 py-2.5 px-4 text-sm bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl transition-all disabled:opacity-50"
+          >
+            {syncing ? <Loader2 size={18} className="animate-spin" /> : <Users size={18} />}
+            {syncing ? 'Sinkronisasi...' : 'Sinkron Jumlah Siswa'}
+          </button>
+          <button 
+            onClick={() => { setEditingClass(null); setForm({ name: '', grade: '7', teacherName: 'Ibu Rina', studentCount: 0 }); setShowForm(true) }} 
+            className="btn-primary flex items-center gap-2 py-2.5 px-4 text-sm"
+          >
+            <Plus size={18} />
+            Tambah Kelas
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -251,6 +317,10 @@ export default function ManageClasses() {
                   <option value="8">Kelas 8</option>
                   <option value="9">Kelas 9</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Nama Wali Kelas *</label>
+                <input type="text" placeholder="Contoh: Ibu Rina" value={form.teacherName} onChange={e => setForm(p => ({ ...p, teacherName: e.target.value }))} className="input-field" />
               </div>
               <div className="flex gap-3 pt-2">
                 <button onClick={() => setShowForm(false)} className="btn-secondary flex-1 py-2.5">Batal</button>
