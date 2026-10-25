@@ -73,13 +73,14 @@ export default function AttendancePage() {
         id: `${student.id}-${selectedDate}`,
         studentId: student.id,
         studentName: student.name,
-        status: attendanceRecord?.status || 'hadir', // Default to hadir
+        status: attendanceRecord?.status || null, // null = belum diabsen
         date: selectedDate,
         kelas: student.kelas
       }
     })
 
     setRecords(newRecords)
+    setSaved(false) // Reset saved state when date/class changes
   }, [filteredStudents, selectedDate])
 
   const summary = {
@@ -87,6 +88,7 @@ export default function AttendancePage() {
     izin: records.filter(r => r.status === 'izin').length,
     sakit: records.filter(r => r.status === 'sakit').length,
     alpa: records.filter(r => r.status === 'alpa').length,
+    belumDiabsen: records.filter(r => r.status === null).length,
   }
 
   function updateStatus(recordId, status) {
@@ -95,14 +97,23 @@ export default function AttendancePage() {
   }
 
   function handleSave() {
-    // Save attendance to database via API
-    console.log('Saving attendance records:', records)
+    // Validate: at least one status must be set
+    const hasAnyStatus = records.some(r => r.status !== null)
+    if (!hasAnyStatus) {
+      toast('Pilih minimal satu status absensi', 'error')
+      return
+    }
+
+    // Only save records with status (skip null/belum diabsen)
+    const recordsToSave = records.filter(r => r.status !== null)
     
-    const promises = records.map(record => 
+    console.log('Saving attendance records:', recordsToSave)
+    
+    const promises = recordsToSave.map(record => 
       apiClient.markAttendance(record.studentId, selectedDate, record.status)
         .catch(err => {
           console.error(`Failed to mark attendance for ${record.studentName}:`, err)
-          return null // Continue with other saves
+          throw err // Propagate error
         })
     )
 
@@ -115,8 +126,20 @@ export default function AttendancePage() {
       .then(updatedStudents => {
         console.log('Updated students loaded:', updatedStudents)
         setAttendanceStudents(updatedStudents)
+        
+        // Update current records with saved data
+        const updatedRecords = records.map(record => {
+          const student = updatedStudents.find(s => s.id === record.studentId)
+          const attendanceRecord = student?.attendance?.find(a => a.date === selectedDate)
+          return {
+            ...record,
+            status: attendanceRecord?.status || record.status
+          }
+        })
+        setRecords(updatedRecords)
+        
         setSaved(true)
-        toast('Absensi berhasil disimpan! ✅', 'success')
+        toast(`Absensi ${recordsToSave.length} siswa berhasil disimpan! ✅`, 'success')
         
         // Reset saved state after 3 seconds
         setTimeout(() => setSaved(false), 3000)
@@ -158,8 +181,13 @@ export default function AttendancePage() {
     const history = []
     const dates = new Set()
     
+    // Only consider students from selected class
+    const studentsToCheck = selectedClass === 'semua' 
+      ? attendanceStudents 
+      : attendanceStudents.filter(s => s.kelas === selectedClass)
+    
     // Collect all unique dates
-    attendanceStudents.forEach(student => {
+    studentsToCheck.forEach(student => {
       student.attendance?.forEach(a => {
         dates.add(a.date)
       })
@@ -167,7 +195,7 @@ export default function AttendancePage() {
 
     // Create summary for each date
     Array.from(dates).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
-      const dateRecords = attendanceStudents.map(student => {
+      const dateRecords = studentsToCheck.map(student => {
         const record = student.attendance?.find(a => a.date === date)
         return {
           status: record?.status || null,
@@ -320,7 +348,7 @@ export default function AttendancePage() {
           {/* Student list */}
           <div className="space-y-2 mb-4">
             {records.map(record => {
-              const cfg = statusConfig[record.status]
+              const cfg = record.status ? statusConfig[record.status] : { label: 'Belum diabsen', color: 'bg-slate-100 text-slate-600 border-slate-300', dot: 'bg-slate-400' }
               return (
                 <div key={record.id} className="card p-3 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm shrink-0">
@@ -343,7 +371,7 @@ export default function AttendancePage() {
                         className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
                           record.status === key
                             ? `${c.color} shadow-sm`
-                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                         }`}
                       >
                         {c.label}
