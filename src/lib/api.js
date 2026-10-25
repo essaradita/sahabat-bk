@@ -270,6 +270,35 @@ class APIClient {
     const query = date ? `?date=${date}` : ''
     return await this.request(`/teacher/attendance/records${query}`)
   }
+
+  // ============================================================
+  // QUESTION MANAGEMENT (Teacher)
+  // ============================================================
+
+  async getMissionQuestions(missionId) {
+    return await this.request(`/teacher/missions/${missionId}/questions`)
+  }
+
+  async saveMissionQuestions(missionId, questions) {
+    return await this.request(`/teacher/missions/${missionId}/questions`, {
+      method: 'POST',
+      body: JSON.stringify({ questions })
+    })
+  }
+
+  async deleteMissionQuestion(missionId, questionId) {
+    return await this.request(`/teacher/missions/${missionId}/questions/${questionId}`, {
+      method: 'DELETE'
+    })
+  }
+
+  // ============================================================
+  // QUESTION FETCH (Student)
+  // ============================================================
+
+  async getStudentMissionQuestions(missionId) {
+    return await this.request(`/student/missions/${missionId}/questions`)
+  }
 }
 
 export const apiClient = new APIClient()

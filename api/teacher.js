@@ -413,6 +413,84 @@ export default async function handler(req, res) {
       }
     }
 
+    // GET /api/teacher/missions/:missionId/questions
+    if (pathParts[0] === 'api' && pathParts[1] === 'teacher' && pathParts[2] === 'missions' && pathParts[3] && pathParts[4] === 'questions' && req.method === 'GET') {
+      const missionId = pathParts[3]
+
+      const questions = await query(
+        'SELECT * FROM mission_questions WHERE mission_id = $1 ORDER BY order_num ASC',
+        [missionId]
+      )
+
+      // Parse options JSONB to array
+      const parsedQuestions = questions.map(q => ({
+        ...q,
+        options: q.options || null,
+        order: q.order_num
+      }))
+
+      return res.json(parsedQuestions)
+    }
+
+    // POST /api/teacher/missions/:missionId/questions - Bulk save all questions
+    if (pathParts[0] === 'api' && pathParts[1] === 'teacher' && pathParts[2] === 'missions' && pathParts[3] && pathParts[4] === 'questions' && req.method === 'POST') {
+      const missionId = pathParts[3]
+      const { questions: questionsData } = body
+
+      if (!Array.isArray(questionsData)) {
+        return res.status(400).json({ error: 'Questions must be an array' })
+      }
+
+      // Check if mission exists
+      const missionExists = await query('SELECT id FROM missions WHERE id = $1', [missionId])
+      if (missionExists.length === 0) {
+        return res.status(404).json({ error: 'Mission not found' })
+      }
+
+      // Delete existing questions for this mission
+      await query('DELETE FROM mission_questions WHERE mission_id = $1', [missionId])
+
+      // Insert all questions
+      for (let i = 0; i < questionsData.length; i++) {
+        const q = questionsData[i]
+        const questionId = q.id && !q.id.startsWith('new-') && !q.id.startsWith('dup-') ? q.id : `q-${Date.now()}-${i}`
+
+        await query(
+          `INSERT INTO mission_questions (id, mission_id, type, question, options, correct_answer, explanation, order_num)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            questionId,
+            missionId,
+            q.type || 'multiple_choice',
+            q.question || '',
+            JSON.stringify(q.options || []),
+            q.correctAnswer || null,
+            q.explanation || '',
+            i + 1
+          ]
+        )
+      }
+
+      return res.json({ 
+        success: true, 
+        message: `${questionsData.length} soal berhasil disimpan`,
+        count: questionsData.length 
+      })
+    }
+
+    // DELETE /api/teacher/missions/:missionId/questions/:questionId
+    if (pathParts[0] === 'api' && pathParts[1] === 'teacher' && pathParts[2] === 'missions' && pathParts[3] && pathParts[4] === 'questions' && pathParts[5] && req.method === 'DELETE') {
+      const questionId = pathParts[5]
+
+      const existing = await query('SELECT id FROM mission_questions WHERE id = $1', [questionId])
+      if (existing.length === 0) {
+        return res.status(404).json({ error: 'Question not found' })
+      }
+
+      await query('DELETE FROM mission_questions WHERE id = $1', [questionId])
+      return res.json({ success: true, message: 'Question deleted' })
+    }
+
     return res.status(404).json({ error: 'Endpoint not found' })
 
   } catch (err) {

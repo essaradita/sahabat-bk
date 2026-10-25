@@ -212,8 +212,7 @@ export default function MissionEditor() {
   const isNew = missionId === 'new'
 
   const existingMission = isNew ? null : demoMissions.find(m => m.id === missionId)
-  const existingQuestions = isNew ? [] : (demoQuestions[missionId] || [])
-
+  
   const [mission, setMission] = useState(existingMission || {
     title: '',
     category: 'pribadi',
@@ -225,11 +224,53 @@ export default function MissionEditor() {
     status: 'draft',
   })
 
-  const [questions, setQuestions] = useState(
-    existingQuestions.map(q => ({ ...q, isNew: false }))
-  )
+  const [questions, setQuestions] = useState([])
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('mission') // 'mission' | 'questions'
+
+  // Load questions from database on mount
+  useEffect(() => {
+    if (!isNew && missionId) {
+      loadQuestionsFromDB()
+    } else {
+      setLoading(false)
+    }
+  }, [missionId, isNew])
+
+  async function loadQuestionsFromDB() {
+    try {
+      setLoading(true)
+      const { apiClient } = await import('../../lib/api')
+      const dbQuestions = await apiClient.getMissionQuestions(missionId)
+      
+      if (dbQuestions && dbQuestions.length > 0) {
+        // Parse questions from DB
+        const parsedQuestions = dbQuestions.map(q => ({
+          id: q.id,
+          type: q.type,
+          question: q.question,
+          options: q.options || [],
+          correctAnswer: q.correct_answer || q.correctAnswer,
+          explanation: q.explanation || '',
+          order: q.order_num || q.order,
+          isNew: false
+        }))
+        setQuestions(parsedQuestions)
+      } else {
+        // Fallback ke demoData jika DB kosong
+        const demoQs = demoQuestions[missionId] || []
+        setQuestions(demoQs.map(q => ({ ...q, isNew: false })))
+      }
+    } catch (err) {
+      console.error('Failed to load questions:', err)
+      // Fallback ke demoData
+      const demoQs = demoQuestions[missionId] || []
+      setQuestions(demoQs.map(q => ({ ...q, isNew: false })))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   function handleMissionChange(field, value) {
     setMission(p => ({ ...p, [field]: value }))
@@ -272,11 +313,39 @@ export default function MissionEditor() {
     if (err) { toast(err, 'error'); return }
 
     setSaving(true)
-    // Demo: simulate save delay
-    await new Promise(r => setTimeout(r, 800))
-    setSaving(false)
-    toast(publish ? 'Misi berhasil dipublikasikan! 🎉' : 'Draft tersimpan!', publish ? 'success' : 'info')
-    if (publish) navigate('/teacher/question-bank')
+    
+    try {
+      const { apiClient } = await import('../../lib/api')
+      
+      // Simpan questions ke database
+      const result = await apiClient.saveMissionQuestions(missionId, questions)
+      
+      console.log('✅ Questions saved:', result)
+      
+      // Update mission status jika publish
+      if (publish) {
+        await apiClient.updateMission(missionId, { ...mission, status: 'active' })
+      }
+      
+      toast(
+        publish 
+          ? `Misi berhasil dipublikasikan! ${result.count} soal tersimpan 🎉` 
+          : `Draft tersimpan! ${result.count} soal berhasil disimpan`, 
+        publish ? 'success' : 'info'
+      )
+      
+      // Reload questions untuk memastikan sinkronisasi
+      await loadQuestionsFromDB()
+      
+      if (publish) {
+        setTimeout(() => navigate('/teacher/question-bank'), 1000)
+      }
+    } catch (error) {
+      console.error('Save failed:', error)
+      toast(`Gagal menyimpan: ${error.message}`, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -296,16 +365,16 @@ export default function MissionEditor() {
         <div className="flex gap-2">
           <button
             onClick={() => handleSave(false)}
-            disabled={saving}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all"
+            disabled={saving || loading}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all disabled:opacity-50"
           >
             <Save size={15} />
             {saving ? 'Menyimpan...' : 'Simpan Draft'}
           </button>
           <button
             onClick={() => handleSave(true)}
-            disabled={saving}
-            className="btn-primary flex items-center gap-2 py-2.5 px-4 text-sm"
+            disabled={saving || loading}
+            className="btn-primary flex items-center gap-2 py-2.5 px-4 text-sm disabled:opacity-50"
           >
             <Send size={15} />
             Publikasikan
@@ -313,21 +382,31 @@ export default function MissionEditor() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-5 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200">
-        <button
-          onClick={() => setActiveTab('mission')}
-          className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'mission' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
-        >
-          📋 Info Misi
-        </button>
-        <button
-          onClick={() => setActiveTab('questions')}
-          className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'questions' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
-        >
-          ✏️ Soal ({questions.length})
-        </button>
-      </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="text-slate-500 mt-3">Memuat soal...</p>
+        </div>
+      )}
+
+      {!loading && (
+        <>
+          {/* Tabs */}
+          <div className="flex gap-2 mb-5 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200">
+            <button
+              onClick={() => setActiveTab('mission')}
+              className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'mission' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              📋 Info Misi
+            </button>
+            <button
+              onClick={() => setActiveTab('questions')}
+              className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'questions' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              ✏️ Soal ({questions.length})
+            </button>
+          </div>
 
       {activeTab === 'mission' && (
         <div className="space-y-4">

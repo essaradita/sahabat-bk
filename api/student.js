@@ -100,6 +100,30 @@ export default async function handler(req, res) {
       })
     }
 
+    // GET /api/student/missions/:missionId/questions
+    if (pathname.match(/^\/api\/student\/missions\/[^/]+\/questions$/) && req.method === 'GET') {
+      const missionId = pathname.split('/')[4]
+      console.log('📝 Getting questions for mission:', missionId)
+
+      const questions = await query(
+        'SELECT * FROM mission_questions WHERE mission_id = $1 ORDER BY order_num ASC',
+        [missionId]
+      )
+
+      const parsedQuestions = questions.map(q => ({
+        id: q.id,
+        type: q.type,
+        question: q.question,
+        options: q.options || null,
+        correctAnswer: q.correct_answer,
+        explanation: q.explanation,
+        order: q.order_num
+      }))
+
+      console.log('✅ Found', parsedQuestions.length, 'questions')
+      return res.json(parsedQuestions)
+    }
+
     console.log('❌ Endpoint not found:', pathname)
     return res.status(404).json({ error: 'Endpoint not found' })
 

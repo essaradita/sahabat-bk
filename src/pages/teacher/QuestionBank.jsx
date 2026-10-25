@@ -29,6 +29,7 @@ export default function QuestionBank() {
   const [missions, setMissions] = useState([])
   const [cases, setCases] = useState([])
   const [loading, setLoading] = useState(true)
+  const [questionCounts, setQuestionCounts] = useState({})
 
   const categories = ['semua', 'pribadi', 'sosial', 'belajar', 'karier']
 
@@ -43,6 +44,8 @@ export default function QuestionBank() {
           const missionsData = await apiClient.getMissions()
           if (missionsData && missionsData.length > 0) {
             setMissions(missionsData)
+            // Fetch question counts for each mission
+            fetchQuestionCounts(missionsData)
           } else {
             // Jika belum ada di database, gunakan demo data
             setMissions(demoMissions)
@@ -132,6 +135,21 @@ export default function QuestionBank() {
     }
     fetchData()
   }, [])
+  
+  // Fetch question counts for missions
+  async function fetchQuestionCounts(missionsData) {
+    const counts = {}
+    for (const mission of missionsData) {
+      try {
+        const questions = await apiClient.getMissionQuestions(mission.id)
+        counts[mission.id] = questions.length
+      } catch (err) {
+        console.error(`Failed to fetch questions for ${mission.id}:`, err)
+        counts[mission.id] = 0
+      }
+    }
+    setQuestionCounts(counts)
+  }
   
   async function handleDeleteMission(missionId) {
     const confirmed = window.confirm('Yakin ingin menghapus misi ini? Data akan hilang permanent.')
@@ -340,7 +358,7 @@ export default function QuestionBank() {
         /* Individual Mission list */
         <div className="space-y-3">
         {filtered.map(mission => {
-          const questionCount = mission.id === 'mission-1' ? 5 : mission.id === 'mission-2' ? 3 : Math.floor(Math.random() * 4) + 2
+          const questionCount = questionCounts[mission.id] ?? 0
           return (
             <div key={mission.id} className="card hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4">

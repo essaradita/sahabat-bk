@@ -65,8 +65,9 @@ export default function MissionPlay() {
   const { missionId } = useParams()
   const navigate = useNavigate()
   const mission = demoMissions.find(m => m.id === missionId)
-  const questions = demoQuestions[missionId] || fallbackQuestions
-
+  
+  const [questions, setQuestions] = useState([])
+  const [loading, setLoading] = useState(true)
   const [currentQ, setCurrentQ] = useState(0)
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
@@ -74,17 +75,68 @@ export default function MissionPlay() {
   const [score, setScore] = useState(0)
   const [answers, setAnswers] = useState([])
 
+  // Load questions from database
+  useEffect(() => {
+    loadQuestions()
+  }, [missionId])
+
+  async function loadQuestions() {
+    try {
+      setLoading(true)
+      const { apiClient } = await import('../../lib/api')
+      const dbQuestions = await apiClient.getStudentMissionQuestions(missionId)
+      
+      if (dbQuestions && dbQuestions.length > 0) {
+        setQuestions(dbQuestions)
+      } else {
+        // Fallback ke demoData atau fallback questions
+        const demoQs = demoQuestions[missionId] || fallbackQuestions
+        setQuestions(demoQs)
+      }
+    } catch (err) {
+      console.error('Failed to load questions:', err)
+      // Fallback ke demoData
+      const demoQs = demoQuestions[missionId] || fallbackQuestions
+      setQuestions(demoQs)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const question = questions[currentQ]
   const isLastQuestion = currentQ === questions.length - 1
   const isReflection = question?.type === 'reflection'
   const isNoWrongAnswer = question?.correctAnswer === null
 
-  if (!mission || !question) {
+  if (!mission) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center px-5">
           <p className="text-5xl mb-3">🔍</p>
           <p className="font-bold text-slate-700">Data misi tidak ditemukan.</p>
+          <button onClick={() => navigate('/student/map')} className="btn-primary mt-4">Ke Peta</button>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center px-5">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="font-bold text-slate-700">Memuat soal...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!question) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center px-5">
+          <p className="text-5xl mb-3">📝</p>
+          <p className="font-bold text-slate-700">Belum ada soal tersedia.</p>
           <button onClick={() => navigate('/student/map')} className="btn-primary mt-4">Ke Peta</button>
         </div>
       </div>
