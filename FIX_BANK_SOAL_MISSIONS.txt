@@ -1,0 +1,209 @@
+================================================================================
+🔧 FIX: Bank Soal - Edit & Tambah Soal Tidak Tersimpan
+================================================================================
+
+MASALAH:
+- Tombol Edit dan Tambah di Bank Soal (Individu) tidak tersimpan
+- Popup "Berhasil tambah soal" muncul tapi data tidak berubah
+- Soal yang diedit/ditambah tidak muncul di siswa
+
+PENYEBAB:
+- Missions dengan ID mission-1 sampai mission-6 tidak ada di database
+- Frontend menampilkan data hardcoded (demoMissions) sebagai fallback
+- API create/update berfungsi, tapi frontend tidak fetch data terbaru
+
+SOLUSI:
+Insert default 6 missions ke database PostgreSQL di Neon.tech
+
+================================================================================
+📋 LANGKAH-LANGKAH FIX
+================================================================================
+
+STEP 1: Login ke Neon.tech Dashboard
+--------------------------------------
+1. Buka https://neon.tech
+2. Login dengan akun kamu
+3. Pilih project "SAHABAT BK"
+4. Klik tab "SQL Editor"
+
+STEP 2: Run SQL Script
+--------------------------------------
+1. Copy SEMUA isi file: database/seed_missions.sql
+2. Paste ke SQL Editor di Neon.tech
+3. Klik tombol "Run" atau tekan Ctrl+Enter
+4. Tunggu sampai muncul "Statement executed successfully"
+
+STEP 3: Verify Data
+--------------------------------------
+Run query ini untuk verify:
+
+```sql
+SELECT * FROM missions ORDER BY id;
+```
+
+Harus muncul 6 missions:
+- mission-1: Detektif Emosi
+- mission-2: Minat dan Bakatku
+- mission-3: Manajemen Waktu
+- mission-4: Konflik Teman Sebaya
+- mission-5: Kekuatan Empati
+- mission-6: Anti Bullying
+
+STEP 4: Test di Website
+--------------------------------------
+1. Refresh halaman Bank Soal Individu (Ctrl+F5)
+2. Lihat 6 missions sudah muncul dari database
+
+3. Test Edit:
+   - Klik icon Edit (pensil biru) pada salah satu mission
+   - Ubah title atau description
+   - Klik "Simpan"
+   - Kembali ke Bank Soal
+   - Refresh halaman
+   - Data harus sudah berubah sesuai edit
+
+4. Test Tambah:
+   - Klik "Misi Baru"
+   - Isi form dengan data baru
+   - Klik "Simpan"
+   - Kembali ke Bank Soal
+   - Refresh halaman
+   - Mission baru harus muncul di list
+
+5. Test Hapus:
+   - Klik icon Hapus (trash merah)
+   - Konfirmasi "Yakin?"
+   - Mission harus hilang dari list
+   - Refresh untuk verify
+
+6. Test di Siswa:
+   - Login sebagai siswa
+   - Buka Adventure Map (Peta Misi)
+   - Mission yang diupdate/ditambah harus muncul
+   - Ketika guru edit mission, siswa juga lihat perubahan
+
+================================================================================
+✅ EXPECTED RESULT SETELAH FIX
+================================================================================
+
+EDIT Mission:
+✅ Klik Edit → Form terisi dengan data mission
+✅ Ubah data → Klik Simpan → Alert sukses
+✅ Refresh Bank Soal → Data sudah berubah
+✅ Login siswa → Siswa lihat mission yang sudah diupdate
+
+TAMBAH Mission:
+✅ Klik "Misi Baru" → Form kosong muncul
+✅ Isi data → Klik Simpan → Alert sukses
+✅ Refresh Bank Soal → Mission baru muncul di list
+✅ Login siswa → Siswa lihat mission baru (jika status = active)
+
+HAPUS Mission:
+✅ Klik Hapus → Konfirmasi muncul
+✅ Klik OK → Mission terhapus
+✅ Refresh → Mission tidak muncul lagi
+✅ Login siswa → Mission tidak muncul di peta
+
+SINKRONISASI Guru ↔ Siswa:
+✅ Guru tambah mission → Siswa langsung bisa lihat (setelah refresh)
+✅ Guru edit mission → Siswa lihat perubahan
+✅ Guru hapus mission → Mission hilang dari siswa
+✅ Siswa complete mission → Progress tersimpan di database
+
+================================================================================
+🐛 TROUBLESHOOTING
+================================================================================
+
+Error: "Misi tidak ditemukan" (masih terjadi setelah run SQL)
+---------------------------------------------------------------------
+Solution:
+1. Verify data dengan query: SELECT * FROM missions;
+2. Pastikan ada 6 rows dengan ID mission-1 sampai mission-6
+3. Clear browser cache (Ctrl+Shift+Delete)
+4. Refresh halaman (Ctrl+F5)
+
+Error: "Popup berhasil muncul tapi data tidak berubah"
+---------------------------------------------------------------------
+Solution:
+1. Buka Browser Console (F12 → Console tab)
+2. Lihat apakah ada error merah
+3. Kemungkinan:
+   - API endpoint gagal (check Vercel logs)
+   - Data tidak ter-refresh (perlu hard refresh Ctrl+F5)
+   - Database connection issue (check POSTGRES_URL)
+
+Error: "Siswa tidak lihat mission yang ditambah guru"
+---------------------------------------------------------------------
+Solution:
+1. Pastikan status mission = 'active' (bukan 'draft')
+2. Refresh halaman siswa (Ctrl+F5)
+3. Check di database: SELECT * FROM missions WHERE status='active';
+4. Pastikan mission_id format: 'mission-X' atau 'mission-timestamp'
+
+================================================================================
+📝 SQL SCRIPT CONTENT
+================================================================================
+
+File: database/seed_missions.sql
+
+INSERT INTO missions (id, title, description, category, difficulty, world_id, xp_reward, coin_reward, estimated_minutes, status)
+VALUES 
+  ('mission-1', 'Detektif Emosi', 'Kenali berbagai emosi...', 'pribadi', 'mudah', 'world-1', 20, 50, 10, 'active'),
+  ('mission-2', 'Minat dan Bakatku', 'Temukan apa yang kamu sukai...', 'pribadi', 'mudah', 'world-1', 20, 50, 12, 'active'),
+  ('mission-3', 'Manajemen Waktu', 'Belajar mengatur waktu...', 'pribadi', 'sedang', 'world-1', 25, 60, 15, 'active'),
+  ('mission-4', 'Konflik Teman Sebaya', 'Cara menyelesaikan pertengkaran...', 'sosial', 'mudah', 'world-2', 20, 50, 10, 'active'),
+  ('mission-5', 'Kekuatan Empati', 'Memahami perasaan orang lain...', 'sosial', 'sedang', 'world-2', 25, 55, 12, 'active'),
+  ('mission-6', 'Anti Bullying', 'Memahami bahaya bullying...', 'sosial', 'sedang', 'world-2', 30, 70, 15, 'active')
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  ... (update semua field)
+
+NOTE: ON CONFLICT DO UPDATE artinya:
+- Jika ID sudah ada → UPDATE (tidak error, tapi update data)
+- Jika ID belum ada → INSERT (tambah baru)
+Ini berguna untuk re-run script tanpa error duplicate.
+
+================================================================================
+🔗 HUBUNGAN GURU ↔ SISWA
+================================================================================
+
+DATABASE (Source of Truth):
+┌─────────────┐
+│   missions  │ ← Semua mission disimpan di sini
+│   table     │
+└─────────────┘
+      ↓
+┌─────────────────────────────┐
+│ Guru Edit Mission           │
+│ API: PUT /teacher/missions  │
+│ → Update database           │
+└─────────────────────────────┘
+      ↓
+┌─────────────────────────────┐
+│ Siswa Fetch Mission         │
+│ API: GET /student/missions  │
+│ atau useMissionProgress()   │
+│ → Ambil dari database       │
+└─────────────────────────────┘
+
+FLOW:
+1. Guru tambah/edit mission di Bank Soal
+2. Data tersimpan ke database (table missions)
+3. Siswa buka Adventure Map
+4. useMissionProgress() fetch dari database
+5. Siswa lihat mission terbaru
+
+PENTING:
+- Guru dan Siswa mengambil data dari SOURCE YANG SAMA (database missions)
+- Tidak ada cache atau data lokal yang terpisah
+- Perubahan guru langsung refleksi ke siswa (setelah refresh)
+
+================================================================================
+✨ DONE!
+================================================================================
+
+Setelah run SQL script, semua fungsi Edit, Tambah, Hapus di Bank Soal akan
+berfungsi dengan baik dan tersinkronisasi antara Guru dan Siswa!
+
+Jika masih ada masalah, screenshot error message dan kasih tahu saya.
