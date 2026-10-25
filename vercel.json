@@ -1,86 +1,36 @@
 {
   "version": 2,
-  "name": "sahabatbk-fullstack",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "installCommand": "npm install",
-  "devCommand": "npm run dev",
+  
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
   
   "rewrites": [
-    {
-      "source": "/api/auth/:path*",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/teacher/:path*",
-      "destination": "/api/teacher"
-    },
-    {
-      "source": "/api/student/:path*",
-      "destination": "/api/student"
-    },
-    {
-      "source": "/api/attendance/:path*",
-      "destination": "/api/attendance"
-    },
-    {
-      "source": "/api",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/auth/:path*", "destination": "/api/auth.js" },
+    { "source": "/api/teacher/:path*", "destination": "/api/teacher.js" },
+    { "source": "/api/student/:path*", "destination": "/api/student.js" },
+    { "source": "/api/attendance/:path*", "destination": "/api/attendance.js" },
+    { "source": "/api/health", "destination": "/api/index.js" },
+    { "source": "/api/debug", "destination": "/api/index.js" },
+    { "source": "/api", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
-      ]
-    },
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
       ]
     }
-  ],
-  
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
