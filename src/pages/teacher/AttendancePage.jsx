@@ -93,13 +93,17 @@ export default function AttendancePage() {
 
   function updateStatus(recordId, status) {
     console.log('Updating status:', recordId, status)
-    setRecords(prev => prev.map(r => {
-      if (r.id === recordId) {
-        console.log('Found record, updating status to:', status)
-        return { ...r, status }
-      }
-      return r
-    }))
+    setRecords(prev => {
+      const updated = prev.map(r => {
+        if (r.id === recordId) {
+          console.log('Found record, updating status to:', status)
+          return { ...r, status }
+        }
+        return r
+      })
+      console.log('Updated records:', updated)
+      return updated
+    })
     setSaved(false)
   }
 
@@ -364,7 +368,7 @@ export default function AttendancePage() {
               }
               
               return (
-                <div key={record.id} className="card p-3 flex items-center gap-3" style={{ position: 'relative', zIndex: 1 }}>
+                <div key={`${record.id}-${currentStatus}`} className="card p-3 flex items-center gap-3" style={{ position: 'relative', zIndex: 1 }}>
                   <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm shrink-0">
                     {record.studentName[0]}
                   </div>
