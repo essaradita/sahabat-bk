@@ -30,9 +30,13 @@ export default async function handler(req, res) {
   try {
     verifyTeacher(req)
 
+    console.log('📍 Attendance request:', { pathname, method: req.method })
+
     // GET /api/teacher/attendance/students
-    if (pathname === '/api/teacher/attendance/students' && req.method === 'GET') {
+    if ((pathname === '/api/teacher/attendance/students' || pathname.includes('/attendance/students')) && req.method === 'GET') {
+      console.log('📋 Getting attendance students...')
       const students = await query('SELECT * FROM attendance_students ORDER BY kelas, name')
+      console.log(`✅ Found ${students.length} attendance students`)
 
       const studentsWithAttendance = await Promise.all(
         students.map(async (student) => {
@@ -48,7 +52,8 @@ export default async function handler(req, res) {
     }
 
     // POST /api/teacher/attendance/students
-    if (pathname === '/api/teacher/attendance/students' && req.method === 'POST') {
+    if ((pathname === '/api/teacher/attendance/students' || pathname.includes('/attendance/students')) && req.method === 'POST') {
+      console.log('➕ Adding attendance student...')
       const { name, kelas } = body
 
       if (!name || !kelas) {
