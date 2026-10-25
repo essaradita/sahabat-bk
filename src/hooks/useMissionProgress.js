@@ -62,6 +62,16 @@ export function useMissionProgress() {
       
       // Jika tidak ada di database, gunakan logika unlock bertahap
       // Cek semua misi sebelumnya sudah completed atau belum
+      if (idx === 0) {
+        // Mission pertama always available
+        console.log(`  → Status: available (first mission)`)
+        return {
+          ...mission,
+          status: 'available'
+        }
+      }
+      
+      // Untuk misi ke-2 dst, cek apakah SEMUA misi sebelumnya completed
       let allPreviousCompleted = true
       
       for (let i = 0; i < idx; i++) {
@@ -70,15 +80,15 @@ export function useMissionProgress() {
         
         if (!prevProgress || prevProgress.status !== 'completed') {
           allPreviousCompleted = false
-          console.log(`  ❌ Misi sebelumnya (${prevMission.id}) belum completed`)
+          console.log(`  ❌ Misi sebelumnya ke-${i+1} (${prevMission.id}) belum completed`)
           break
+        } else {
+          console.log(`  ✅ Misi sebelumnya ke-${i+1} (${prevMission.id}) sudah completed`)
         }
       }
       
-      // Mission pertama always available, sisanya tergantung misi sebelumnya
-      const status = idx === 0 ? 'available' : (allPreviousCompleted ? 'available' : 'locked')
-      
-      console.log(`  → Status: ${status} (${idx === 0 ? 'first mission' : allPreviousCompleted ? 'all previous completed' : 'previous not completed'})`)
+      const status = allPreviousCompleted ? 'available' : 'locked'
+      console.log(`  → Status: ${status} (${allPreviousCompleted ? 'all previous completed' : 'previous not completed'})`)
       
       return {
         ...mission,
