@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-<parameter name="useLocation" />navigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useMissionProgress } from '../../hooks/useMissionProgress'
 import { ArrowLeft, Coins } from 'lucide-react'
