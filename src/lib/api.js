@@ -130,6 +130,13 @@ class APIClient {
     return await this.request('/teacher/students')
   }
 
+  async addStudent(studentData) {
+    return await this.request('/teacher/students', {
+      method: 'POST',
+      body: JSON.stringify(studentData)
+    })
+  }
+
   // Mission progress endpoints (Student)
   async getStudentMissions() {
     return await this.request('/student/missions')

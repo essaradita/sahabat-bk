@@ -1,0 +1,75 @@
+================================================================================
+✅ PERUBAHAN WARNA NAMA PEMBUAT - SELESAI
+================================================================================
+
+Request: Ubah warna font nama pembuat menjadi abu samar (tidak terlalu jelas)
+
+================================================================================
+📝 FILES YANG DIUBAH (5 FILES)
+================================================================================
+
+1. src/pages/student/StudentProfile.jsx
+   BEFORE: text-blue-800 (biru terang, font-black)
+   AFTER:  text-slate-400 (abu samar, font-semibold)
+   
+2. src/layouts/TeacherLayout.jsx (Sidebar Teacher)
+   BEFORE: text-white (putih terang, font-semibold)
+   AFTER:  text-blue-300/50 (biru abu samar dengan opacity 50%, font-medium)
+   
+3. src/pages/auth/LoginStudent.jsx
+   BEFORE: text-emerald-700 (hijau terang, font-bold)
+   AFTER:  text-slate-400 (abu samar, font-medium)
+   
+4. src/pages/auth/LoginTeacher.jsx
+   BEFORE: text-blue-700 (biru terang, font-bold)
+   AFTER:  text-slate-400 (abu samar, font-medium)
+   
+5. src/pages/auth/LandingPage.jsx
+   BEFORE: text-blue-700 (biru terang, font-semibold)
+   AFTER:  text-slate-400 (abu samar, font-medium)
+
+================================================================================
+🎨 DETAIL PERUBAHAN WARNA
+================================================================================
+
+NAMA PEMBUAT: "Kartika Wulandari, S.Sos."
+
+Location                    | Old Color        | New Color        | Visibility
+----------------------------|------------------|------------------|------------
+Student Profile             | text-blue-800    | text-slate-400   | Abu samar ✓
+Teacher Sidebar             | text-white       | text-blue-300/50 | Abu samar ✓
+Login Student               | text-emerald-700 | text-slate-400   | Abu samar ✓
+Login Teacher               | text-blue-700    | text-slate-400   | Abu samar ✓
+Landing Page                | text-blue-700    | text-slate-400   | Abu samar ✓
+
+================================================================================
+📊 RINGKASAN PERUBAHAN
+================================================================================
+
+✅ Total files diubah: 5 files
+✅ Warna nama pembuat: Dari warna terang → Abu samar (slate-400 atau blue-300/50)
+✅ Font weight: Dari bold/black → medium/semibold (lebih lembut)
+✅ Visibility: Tetap terbaca tapi tidak terlalu menonjol
+✅ Text "Dikembangkan oleh": Juga diubah menjadi abu lebih samar (slate-300)
+
+================================================================================
+🎯 HASIL AKHIR
+================================================================================
+
+Nama pembuat "Kartika Wulandari, S.Sos." sekarang ditampilkan dengan:
+- Warna abu samar (tidak mencolok)
+- Font weight lebih ringan (tidak terlalu tebal)
+- Tetap terbaca tapi tidak mendominasi tampilan
+- Konsisten di semua halaman (login student, login teacher, profile, landing page, sidebar)
+
+================================================================================
+✨ STATUS: SELESAI
+================================================================================
+
+Semua nama pembuat di aplikasi sudah diubah menjadi warna abu samar.
+Perubahan sudah disimpan dan siap untuk di-commit ke GitHub.
+
+NEXT STEP:
+1. Test tampilan di browser (refresh halaman)
+2. Verifikasi warna sudah pas (tidak terlalu jelas)
+3. Commit & push ke GitHub jika sudah OK

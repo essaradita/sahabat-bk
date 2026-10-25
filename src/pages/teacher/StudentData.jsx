@@ -256,15 +256,36 @@ export default function StudentData() {
     }
 
     try {
-      const result = await apiClient.addAttendanceStudent({
-        name: newStudent.name.trim(),
-        kelas: newStudent.kelas.trim()
-      })
+      if (activeTab === 'gamification') {
+        // Tambah siswa lengkap dengan akun login
+        const result = await apiClient.addStudent({
+          name: newStudent.name.trim(),
+          kelas: newStudent.kelas.trim()
+        })
 
-      setAttendanceStudents([result.student, ...attendanceStudents])
-      setNewStudent({ name: '', kelas: '' })
-      setShowAddStudent(false)
-      alert('Siswa berhasil ditambahkan!')
+        if (result.success && result.student) {
+          // Refresh student list
+          const updatedStudents = await apiClient.getStudents()
+          setStudents(updatedStudents || [])
+          
+          setNewStudent({ name: '', kelas: '' })
+          setShowAddStudent(false)
+          
+          // Show success message with login credentials
+          alert(`✅ Siswa berhasil ditambahkan!\n\nUsername: ${result.student.username}\nPassword: ${result.student.password}\n\nBerikan username dan password ini kepada siswa untuk login.`)
+        }
+      } else {
+        // Tambah siswa untuk absensi saja
+        const result = await apiClient.addAttendanceStudent({
+          name: newStudent.name.trim(),
+          kelas: newStudent.kelas.trim()
+        })
+
+        setAttendanceStudents([result.student, ...attendanceStudents])
+        setNewStudent({ name: '', kelas: '' })
+        setShowAddStudent(false)
+        alert('Siswa berhasil ditambahkan ke daftar absensi!')
+      }
     } catch (err) {
       console.error('Add student error:', err)
       alert('Gagal menambah siswa: ' + err.message)
@@ -396,7 +417,7 @@ export default function StudentData() {
             </button>
           ))}
         </div>
-        {activeTab === 'attendance' && (
+        {(activeTab === 'attendance' || activeTab === 'gamification') && (
           <button
             onClick={() => setShowAddStudent(true)}
             className="btn-primary flex items-center gap-2 py-2.5 px-4 text-sm whitespace-nowrap"

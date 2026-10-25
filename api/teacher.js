@@ -1,5 +1,6 @@
 // Vercel Serverless Function: All Teacher Endpoints
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 import { randomUUID } from 'crypto'
 import { query } from '../lib/db-postgres.js'
 
@@ -59,6 +60,59 @@ export default async function handler(req, res) {
       )
 
       return res.json(studentsWithStats)
+    }
+
+    // POST /api/teacher/students - Add new student
+    if (pathname === '/api/teacher/students' && req.method === 'POST') {
+      const { name, kelas } = body
+
+      if (!name || !kelas) {
+        return res.status(400).json({ error: 'Nama dan kelas wajib diisi' })
+      }
+
+      // Generate username dari nama (lowercase, no space)
+      const username = name.toLowerCase().replace(/\s+/g, '.')
+      const password = 'siswa123' // Default password
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      const studentId = randomUUID()
+      const avatarType = 'boy1' // Default avatar
+      const email = `${username}@sahabatbk.internal`
+
+      // Insert ke profiles
+      await query(
+        `INSERT INTO profiles (id, role, name, username, email, password, kelas, avatar, gender) 
+         VALUES ($1, 'student', $2, $3, $4, $5, $6, $7, 'male')`,
+        [studentId, name, username, email, hashedPassword, kelas, avatarType]
+      )
+
+      // Insert ke student_progress
+      await query(
+        `INSERT INTO student_progress (id, student_id, xp, level, coins) 
+         VALUES ($1, $2, 0, 1, 0)`,
+        [randomUUID(), studentId]
+      )
+
+      // Insert ke attendance_students untuk sinkronisasi
+      const attendanceId = `att-${Date.now()}`
+      await query(
+        'INSERT INTO attendance_students (id, name, kelas) VALUES ($1, $2, $3)',
+        [attendanceId, name, kelas]
+      )
+
+      return res.json({ 
+        success: true, 
+        student: {
+          id: studentId,
+          name,
+          username,
+          kelas,
+          password: 'siswa123', // Return default password untuk dikasih tahu ke siswa
+          message: 'Siswa berhasil ditambahkan. Password default: siswa123'
+        }
+      })
     }
 
     // GET /api/teacher/missions

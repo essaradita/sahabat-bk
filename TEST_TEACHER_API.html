@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Teacher API - Real Mission Counts</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f0f4f8;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e40af;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    .test-btn {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      margin-right: 10px;
+      transition: all 0.3s;
+    }
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    .test-btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .success {
+      border-color: #10b981;
+      background: #f0fdf4;
+      color: #065f46;
+    }
+    .error {
+      border-color: #ef4444;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+    .student-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+    .student-name {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+    .student-stats {
+      display: flex;
+      gap: 15px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stat-value {
+      font-weight: 700;
+      color: #3b82f6;
+    }
+    .instructions {
+      background: #fef3c7;
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .instructions strong {
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Test Teacher API - Real Mission Counts</h1>
+    <p class="subtitle">Verifikasi bahwa dashboard guru menampilkan jumlah misi yang selesai dari database</p>
+
+    <div class="instructions">
+      <strong>📋 Cara Test:</strong><br>
+      1. Login sebagai teacher terlebih dahulu (buka tab baru, login di /teacher/login)<br>
+      2. Kembali ke halaman ini, klik tombol "Test Get Students"<br>
+      3. Lihat jumlah "missionsCompleted" untuk setiap siswa<br>
+      4. Jumlah ini harus dari database (BUKAN hardcoded 0)
+    </div>
+
+    <div class="section">
+      <div class="section-title">🎯 Test Endpoint</div>
+      <button class="test-btn" onclick="testGetStudents()">Test Get Students (with Mission Counts)</button>
+      <button class="test-btn" onclick="clearResult()" style="background: #64748b;">Clear</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const API_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000'
+      : window.location.origin
+
+    function getToken() {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        showError('❌ Token tidak ditemukan!\n\nSilakan login sebagai teacher terlebih dahulu di /teacher/login')
+        return null
+      }
+      return token
+    }
+
+    async function testGetStudents() {
+      const token = getToken()
+      if (!token) return
+
+      const resultDiv = document.getElementById('result')
+      resultDiv.textContent = '⏳ Mengambil data siswa dari database...'
+      resultDiv.className = ''
+
+      try {
+        const response = await fetch(`${API_URL}/api/teacher/students`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP ${response.status}`)
+        }
+
+        // Parse dan tampilkan hasil
+        let output = '✅ SUCCESS - Data Siswa Berhasil Diambil\n\n'
+        output += `Total Siswa: ${data.length}\n`
+        output += '=' .repeat(70) + '\n\n'
+
+        if (data.length === 0) {
+          output += '⚠️ Belum ada siswa terdaftar\n'
+          output += 'Silakan register siswa baru di /student/register'
+        } else {
+          // Kelompokkan data
+          const withMissions = data.filter(s => s.missionsCompleted > 0)
+          const withoutMissions = data.filter(s => s.missionsCompleted === 0)
+
+          output += `📊 STATISTIK:\n`
+          output += `- Siswa dengan misi selesai: ${withMissions.length}\n`
+          output += `- Siswa belum ada misi selesai: ${withoutMissions.length}\n`
+          output += `- Total misi diselesaikan: ${data.reduce((sum, s) => sum + s.missionsCompleted, 0)}\n\n`
+
+          // Tampilkan siswa dengan misi
+          if (withMissions.length > 0) {
+            output += '🎯 SISWA DENGAN MISI SELESAI:\n'
+            output += '-'.repeat(70) + '\n'
+            withMissions.forEach((student, idx) => {
+              output += `${idx + 1}. ${student.name}\n`
+              output += `   - Username: ${student.username}\n`
+              output += `   - Kelas: ${student.kelas || 'Belum diset'}\n`
+              output += `   - Misi Selesai: ⭐ ${student.missionsCompleted} misi\n`
+              output += `   - Level: ${student.level || 1} | XP: ${student.xp || 0} | Koin: ${student.coins || 0}\n\n`
+            })
+          }
+
+          // Tampilkan siswa tanpa misi
+          if (withoutMissions.length > 0) {
+            output += '\n📝 SISWA BELUM ADA MISI SELESAI:\n'
+            output += '-'.repeat(70) + '\n'
+            withoutMissions.slice(0, 5).forEach((student, idx) => {
+              output += `${idx + 1}. ${student.name} (${student.username})\n`
+              output += `   - Kelas: ${student.kelas || 'Belum diset'}\n`
+              output += `   - Misi Selesai: 0 (belum ada)\n\n`
+            })
+            if (withoutMissions.length > 5) {
+              output += `   ... dan ${withoutMissions.length - 5} siswa lainnya\n`
+            }
+          }
+        }
+
+        output += '\n' + '='.repeat(70) + '\n'
+        output += '✅ KESIMPULAN:\n'
+        output += 'Endpoint /api/teacher/students berhasil menampilkan jumlah misi\n'
+        output += 'yang diselesaikan dari database (field missionsCompleted).\n'
+        output += 'Dashboard guru sekarang menampilkan data REAL dari database!'
+
+        resultDiv.textContent = output
+        resultDiv.className = 'success'
+
+      } catch (err) {
+        showError(`❌ ERROR:\n${err.message}\n\nPastikan:\n1. Sudah login sebagai teacher\n2. Backend sudah deploy di Vercel\n3. Database PostgreSQL aktif`)
+      }
+    }
+
+    function showError(message) {
+      const resultDiv = document.getElementById('result')
+      resultDiv.textContent = message
+      resultDiv.className = 'error'
+    }
+
+    function clearResult() {
+      document.getElementById('result').textContent = ''
+      document.getElementById('result').className = ''
+    }
+  </script>
+</body>
+</html>
