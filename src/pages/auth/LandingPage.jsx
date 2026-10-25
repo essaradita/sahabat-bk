@@ -148,9 +148,9 @@ export default function LandingPage() {
             <p className="text-slate-400 text-xs font-medium">
               Sahabat BK &nbsp;·&nbsp; Platform Pembelajaran BK untuk SMP
             </p>
-            <p className="text-slate-500 text-xs font-semibold mt-2 flex items-center justify-center gap-1.5">
-              <span className="text-slate-400">Dikembangkan oleh</span>
-              <span className="text-blue-700">Kartika Wulandari, S.Sos.</span>
+            <p className="text-slate-500 text-xs font-medium mt-2 flex items-center justify-center gap-1.5">
+              <span className="text-slate-300">Dikembangkan oleh</span>
+              <span className="text-slate-400">Kartika Wulandari, S.Sos.</span>
             </p>
           </div>
         </div>

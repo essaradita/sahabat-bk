@@ -120,10 +120,10 @@ export default function LoginStudent() {
 
           {/* Creator Credit */}
           <div className="mt-4 pt-3 border-t border-slate-200">
-            <p className="text-slate-400 text-[10px] text-center">
+            <p className="text-slate-300 text-[10px] text-center">
               Dikembangkan oleh
             </p>
-            <p className="text-emerald-700 text-xs font-bold text-center">
+            <p className="text-slate-400 text-xs font-medium text-center">
               Kartika Wulandari, S.Sos.
             </p>
           </div>

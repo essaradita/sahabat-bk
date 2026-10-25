@@ -99,9 +99,9 @@ export default function TeacherLayout() {
           
           {/* Creator credit */}
           <div className="mt-3 pt-3 border-t border-blue-700/50">
-            <p className="text-blue-300 text-[10px] text-center leading-relaxed">
+            <p className="text-blue-400/40 text-[10px] text-center leading-relaxed">
               Dikembangkan oleh<br />
-              <span className="text-white font-semibold">Kartika Wulandari, S.Sos.</span>
+              <span className="text-blue-300/50 font-medium">Kartika Wulandari, S.Sos.</span>
             </p>
           </div>
         </div>

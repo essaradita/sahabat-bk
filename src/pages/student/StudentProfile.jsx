@@ -167,9 +167,9 @@ export default function StudentProfile() {
         {/* Creator Credit */}
         <div className="card bg-gradient-to-br from-slate-50 to-blue-50 border border-blue-100">
           <div className="text-center">
-            <p className="text-slate-500 text-xs font-medium mb-1">Sistem dikembangkan oleh</p>
-            <p className="text-blue-800 text-sm font-black">Kartika Wulandari, S.Sos.</p>
-            <p className="text-slate-400 text-[10px] mt-2">Sahabat BK © 2026</p>
+            <p className="text-slate-400 text-xs font-medium mb-1">Sistem dikembangkan oleh</p>
+            <p className="text-slate-400 text-sm font-semibold">Kartika Wulandari, S.Sos.</p>
+            <p className="text-slate-300 text-[10px] mt-2">Sahabat BK © 2026</p>
           </div>
         </div>
       </div>
