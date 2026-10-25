@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { BookOpen, Plus, Calendar, Lock, Heart, Smile, Meh, Frown, X, MessageSquare } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { BookOpen, Plus, Calendar, Lock, Heart, Smile, Meh, Frown, X, MessageSquare, Loader2 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { apiClient } from '../../lib/api'
 
 const moods = [
   { id: 'happy', icon: '😊', label: 'Senang', color: 'text-yellow-500', bg: 'bg-yellow-50 border-yellow-300' },
@@ -11,27 +12,9 @@ const moods = [
   { id: 'anxious', icon: '😰', label: 'Cemas', color: 'text-purple-500', bg: 'bg-purple-50 border-purple-300' },
 ]
 
-const demoEntries = [
-  {
-    id: 'j1',
-    date: '2025-05-12',
-    mood: 'happy',
-    title: 'Hari yang menyenangkan',
-    content: 'Hari ini aku berhasil menyelesaikan misi Detektif Emosi. Aku jadi lebih paham tentang cara mengelola perasaan marah.',
-    private: true,
-  },
-  {
-    id: 'j2',
-    date: '2025-05-10',
-    mood: 'anxious',
-    title: 'Sebelum ujian',
-    content: 'Besok ada ulangan matematika. Sedikit cemas, tapi sudah belajar. Ingat kata Bu Rina: cemas itu wajar, yang penting tetap coba!',
-    private: true,
-  },
-]
-
 function JournalEntry({ entry }) {
   const mood = moods.find(m => m.id === entry.mood)
+  const entryDate = entry.date || entry.created_at
   return (
     <div className="card hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
@@ -40,9 +23,9 @@ function JournalEntry({ entry }) {
           <div className="flex items-center justify-between gap-2 mb-1">
             <h3 className="font-black text-slate-800 text-sm truncate">{entry.title}</h3>
             <div className="flex items-center gap-1 shrink-0">
-              {entry.private && <Lock size={12} className="text-slate-400" />}
+              {entry.is_private !== false && <Lock size={12} className="text-slate-400" />}
               <span className="text-xs text-slate-400">
-                {new Date(entry.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                {new Date(entryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
               </span>
             </div>
           </div>
@@ -56,11 +39,20 @@ function JournalEntry({ entry }) {
 
 function NewEntryForm({ onClose, onSave }) {
   const [form, setForm] = useState({ title: '', content: '', mood: '', isPrivate: true })
+  const [saving, setSaving] = useState(false)
 
-  function handleSave() {
+  async function handleSave() {
     if (!form.title.trim() || !form.content.trim() || !form.mood) return
-    onSave({ ...form, id: Date.now().toString(), date: new Date().toISOString().split('T')[0] })
-    onClose()
+    
+    setSaving(true)
+    try {
+      await onSave(form)
+      onClose()
+    } catch (err) {
+      alert('Gagal menyimpan jurnal: ' + err.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -132,10 +124,17 @@ function NewEntryForm({ onClose, onSave }) {
 
           <button
             onClick={handleSave}
-            disabled={!form.title.trim() || !form.content.trim() || !form.mood}
-            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!form.title.trim() || !form.content.trim() || !form.mood || saving}
+            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Simpan Jurnal 💾
+            {saving ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              <>Simpan Jurnal 💾</>
+            )}
           </button>
         </div>
       </div>
@@ -145,14 +144,39 @@ function NewEntryForm({ onClose, onSave }) {
 
 export default function StudentJournal() {
   const { profile } = useAuth()
-  const [entries, setEntries] = useState(demoEntries)
+  const [entries, setEntries] = useState([])
+  const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showCounseling, setShowCounseling] = useState(false)
   const [counselingForm, setCounselingForm] = useState({ topic: '', message: '', preferred: '' })
   const [counselingSent, setCounselingSent] = useState(false)
 
-  function handleSaveEntry(entry) {
-    setEntries(prev => [entry, ...prev])
+  // Load journals from database on mount
+  useEffect(() => {
+    loadJournals()
+  }, [])
+
+  async function loadJournals() {
+    try {
+      setLoading(true)
+      const journals = await apiClient.getJournals()
+      setEntries(journals || [])
+    } catch (err) {
+      console.error('Failed to load journals:', err)
+      // Don't show error to user, just empty state
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleSaveEntry(formData) {
+    const result = await apiClient.createJournal(formData)
+    if (result.success) {
+      // Reload journals to get fresh data from server
+      await loadJournals()
+    } else {
+      throw new Error('Failed to save journal')
+    }
   }
 
   return (
@@ -169,58 +193,71 @@ export default function StudentJournal() {
       </div>
 
       <div className="px-5 py-5 space-y-4">
-        {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all"
-          >
-            <Plus size={18} />
-            Tulis Jurnal
-          </button>
-          <button
-            onClick={() => setShowCounseling(true)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all"
-          >
-            <MessageSquare size={18} />
-            Konsultasi BK
-          </button>
-        </div>
-
-        {/* Mood summary */}
-        <div className="card">
-          <h3 className="font-black text-slate-800 mb-3 text-sm">Perasaanmu Minggu Ini</h3>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map((day, i) => {
-              const dayMoods = ['happy', 'okay', 'excited', 'anxious', 'happy', null, null]
-              const m = moods.find(x => x.id === dayMoods[i])
-              return (
-                <div key={day} className="flex flex-col items-center gap-1 min-w-[36px]">
-                  <span className="text-xl">{m ? m.icon : '○'}</span>
-                  <span className="text-xs text-slate-400">{day}</span>
-                </div>
-              )
-            })}
+        {/* Loading state */}
+        {loading && (
+          <div className="text-center py-12">
+            <Loader2 size={40} className="animate-spin text-purple-600 mx-auto mb-3" />
+            <p className="text-slate-500">Memuat jurnal...</p>
           </div>
-        </div>
+        )}
 
-        {/* Entries */}
-        <div>
-          <h2 className="font-black text-slate-800 mb-3">Entri Terbaru</h2>
-          {entries.length > 0 ? (
-            <div className="space-y-3">
-              {entries.map(entry => (
-                <JournalEntry key={entry.id} entry={entry} />
-              ))}
+        {!loading && (
+          <>
+            {/* Action buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all"
+              >
+                <Plus size={18} />
+                Tulis Jurnal
+              </button>
+              <button
+                onClick={() => setShowCounseling(true)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all"
+              >
+                <MessageSquare size={18} />
+                Konsultasi BK
+              </button>
             </div>
-          ) : (
-            <div className="text-center py-10">
-              <span className="text-5xl">📔</span>
-              <p className="text-slate-500 mt-3 font-semibold">Belum ada entri jurnal</p>
-              <p className="text-slate-400 text-sm">Mulai tulis perasaanmu hari ini!</p>
+
+            {/* Mood summary */}
+            <div className="card">
+              <h3 className="font-black text-slate-800 mb-3 text-sm">Perasaanmu Minggu Ini</h3>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                {['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map((day, i) => {
+                  // Get last 7 entries and map to days
+                  const recentEntry = entries[entries.length - 1 - i]
+                  const m = recentEntry ? moods.find(x => x.id === recentEntry.mood) : null
+                  return (
+                    <div key={day} className="flex flex-col items-center gap-1 min-w-[36px]">
+                      <span className="text-xl">{m ? m.icon : '○'}</span>
+                      <span className="text-xs text-slate-400">{day}</span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* Entries */}
+            <div>
+              <h2 className="font-black text-slate-800 mb-3">Entri Terbaru</h2>
+              {entries.length > 0 ? (
+                <div className="space-y-3">
+                  {entries.map(entry => (
+                    <JournalEntry key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <span className="text-5xl">📔</span>
+                  <p className="text-slate-500 mt-3 font-semibold">Belum ada entri jurnal</p>
+                  <p className="text-slate-400 text-sm">Mulai tulis perasaanmu hari ini!</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Counseling form */}
         {showCounseling && (

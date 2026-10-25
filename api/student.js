@@ -124,6 +124,99 @@ export default async function handler(req, res) {
       return res.json(parsedQuestions)
     }
 
+    // GET /api/student/journals - Get all journals for logged-in student
+    if (pathname === '/api/student/journals' && req.method === 'GET') {
+      console.log('📔 Getting journals for student:', studentId)
+
+      const journals = await query(
+        `SELECT id, title, content, mood, is_private, mission_id, 
+                DATE(created_at) as date, created_at, updated_at 
+         FROM reflections 
+         WHERE student_id = $1 
+         ORDER BY created_at DESC`,
+        [studentId]
+      )
+
+      console.log('✅ Found', journals.length, 'journals')
+      return res.json(journals)
+    }
+
+    // POST /api/student/journals - Create new journal entry
+    if (pathname === '/api/student/journals' && req.method === 'POST') {
+      const { title, content, mood, isPrivate, missionId } = body
+
+      console.log('📝 Creating journal for student:', studentId)
+
+      if (!title || !content) {
+        return res.status(400).json({ error: 'Title and content are required' })
+      }
+
+      const journalId = `journal-${Date.now()}`
+
+      await query(
+        `INSERT INTO reflections (id, student_id, title, content, mood, is_private, mission_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [journalId, studentId, title.trim(), content.trim(), mood || null, isPrivate !== false, missionId || null]
+      )
+
+      const newJournal = await query('SELECT * FROM reflections WHERE id = $1', [journalId])
+
+      console.log('✅ Journal created:', journalId)
+      return res.json({ success: true, journal: newJournal[0] })
+    }
+
+    // PUT /api/student/journals/:id - Update existing journal
+    if (pathname.match(/^\/api\/student\/journals\/[^/]+$/) && req.method === 'PUT') {
+      const journalId = pathname.split('/')[4]
+      const { title, content, mood, isPrivate } = body
+
+      console.log('📝 Updating journal:', journalId)
+
+      // Verify ownership
+      const existing = await query(
+        'SELECT id FROM reflections WHERE id = $1 AND student_id = $2',
+        [journalId, studentId]
+      )
+
+      if (existing.length === 0) {
+        return res.status(404).json({ error: 'Journal not found or access denied' })
+      }
+
+      await query(
+        `UPDATE reflections 
+         SET title = $1, content = $2, mood = $3, is_private = $4, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $5 AND student_id = $6`,
+        [title.trim(), content.trim(), mood || null, isPrivate !== false, journalId, studentId]
+      )
+
+      const updated = await query('SELECT * FROM reflections WHERE id = $1', [journalId])
+
+      console.log('✅ Journal updated:', journalId)
+      return res.json({ success: true, journal: updated[0] })
+    }
+
+    // DELETE /api/student/journals/:id - Delete journal
+    if (pathname.match(/^\/api\/student\/journals\/[^/]+$/) && req.method === 'DELETE') {
+      const journalId = pathname.split('/')[4]
+
+      console.log('🗑️ Deleting journal:', journalId)
+
+      // Verify ownership
+      const existing = await query(
+        'SELECT id FROM reflections WHERE id = $1 AND student_id = $2',
+        [journalId, studentId]
+      )
+
+      if (existing.length === 0) {
+        return res.status(404).json({ error: 'Journal not found or access denied' })
+      }
+
+      await query('DELETE FROM reflections WHERE id = $1 AND student_id = $2', [journalId, studentId])
+
+      console.log('✅ Journal deleted:', journalId)
+      return res.json({ success: true, message: 'Journal deleted' })
+    }
+
     console.log('❌ Endpoint not found:', pathname)
     return res.status(404).json({ error: 'Endpoint not found' })
 

@@ -299,6 +299,34 @@ class APIClient {
   async getStudentMissionQuestions(missionId) {
     return await this.request(`/student/missions/${missionId}/questions`)
   }
+
+  // ============================================================
+  // JOURNAL MANAGEMENT (Student)
+  // ============================================================
+
+  async getJournals() {
+    return await this.request('/student/journals')
+  }
+
+  async createJournal(journalData) {
+    return await this.request('/student/journals', {
+      method: 'POST',
+      body: JSON.stringify(journalData)
+    })
+  }
+
+  async updateJournal(journalId, journalData) {
+    return await this.request(`/student/journals/${journalId}`, {
+      method: 'PUT',
+      body: JSON.stringify(journalData)
+    })
+  }
+
+  async deleteJournal(journalId) {
+    return await this.request(`/student/journals/${journalId}`, {
+      method: 'DELETE'
+    })
+  }
 }
 
 export const apiClient = new APIClient()
