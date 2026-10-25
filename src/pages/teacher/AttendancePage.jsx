@@ -92,7 +92,14 @@ export default function AttendancePage() {
   }
 
   function updateStatus(recordId, status) {
-    setRecords(prev => prev.map(r => r.id === recordId ? { ...r, status } : r))
+    console.log('Updating status:', recordId, status)
+    setRecords(prev => prev.map(r => {
+      if (r.id === recordId) {
+        console.log('Found record, updating status to:', status)
+        return { ...r, status }
+      }
+      return r
+    }))
     setSaved(false)
   }
 
@@ -172,6 +179,7 @@ export default function AttendancePage() {
 
   // Mark all students present
   function markAllPresent() {
+    console.log('Marking all present')
     setRecords(prev => prev.map(r => ({ ...r, status: 'hadir' })))
     setSaved(false)
   }
@@ -367,12 +375,18 @@ export default function AttendancePage() {
                     {Object.entries(statusConfig).map(([key, c]) => (
                       <button
                         key={key}
-                        onClick={() => updateStatus(record.id, key)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          updateStatus(record.id, key)
+                        }}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
                           record.status === key
                             ? `${c.color} shadow-sm`
                             : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                         }`}
+                        style={{ pointerEvents: 'auto', userSelect: 'none' }}
                       >
                         {c.label}
                       </button>
@@ -384,8 +398,10 @@ export default function AttendancePage() {
           </div>
 
           <button
+            type="button"
             onClick={handleSave}
-            className={`w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all ${saved ? 'bg-emerald-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} shadow-lg`}
+            disabled={saved}
+            className={`w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all ${saved ? 'bg-emerald-500 text-white cursor-default' : 'bg-blue-600 hover:bg-blue-700 text-white'} shadow-lg disabled:opacity-90`}
           >
             {saved ? <><CheckCircle size={20} /> Absensi Tersimpan</> : <><Save size={20} /> Simpan Absensi</>}
           </button>
