@@ -327,6 +327,17 @@ class APIClient {
       method: 'DELETE'
     })
   }
+
+  // ============================================================
+  // PROGRESS MANAGEMENT (Student)
+  // ============================================================
+
+  async resetProgress(resetXP = false) {
+    return await this.request('/student/progress/reset', {
+      method: 'POST',
+      body: JSON.stringify({ resetXP })
+    })
+  }
 }
 
 export const apiClient = new APIClient()

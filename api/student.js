@@ -217,6 +217,38 @@ export default async function handler(req, res) {
       return res.json({ success: true, message: 'Journal deleted' })
     }
 
+    // POST /api/student/progress/reset - Reset all progress
+    if (pathname === '/api/student/progress/reset' && req.method === 'POST') {
+      const { resetXP = false } = body
+
+      console.log('🔄 Resetting progress for student:', studentId, 'resetXP:', resetXP)
+
+      try {
+        // Delete all mission progress
+        await query('DELETE FROM mission_progress WHERE student_id = $1', [studentId])
+        console.log('✅ All mission progress deleted')
+
+        // Optionally reset XP, level, and coins
+        if (resetXP) {
+          await query(
+            'UPDATE student_progress SET xp = 0, level = 1, coins = 0, updated_at = CURRENT_TIMESTAMP WHERE student_id = $1',
+            [studentId]
+          )
+          console.log('✅ XP, level, and coins reset to 0')
+        }
+
+        console.log('✅ Progress reset successfully!')
+        return res.json({ 
+          success: true, 
+          message: 'Progress berhasil direset! Semua misi sekarang dapat dimainkan ulang dengan soal terbaru dari guru.',
+          resetXP 
+        })
+      } catch (err) {
+        console.error('❌ Reset progress error:', err)
+        return res.status(500).json({ error: 'Gagal mereset progress', detail: err.message })
+      }
+    }
+
     console.log('❌ Endpoint not found:', pathname)
     return res.status(404).json({ error: 'Endpoint not found' })
 
