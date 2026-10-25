@@ -23,12 +23,16 @@ export default async function handler(req, res) {
   const pathname = req.url.split('?')[0]
   
   console.log('🔍 Auth Request:', req.method, pathname)
-  console.log('📦 Body type:', typeof req.body, req.body ? Object.keys(req.body) : 'no body')
-
-  // Vercel automatically parses body, but we store it in a variable for clarity
-  const body = req.body || {}
+  console.log('📦 Body:', JSON.stringify(req.body))
+  console.log('🔑 Env check:', {
+    postgres: !!process.env.POSTGRES_URL,
+    jwt: !!process.env.JWT_SECRET
+  })
 
   try {
+    // Vercel automatically parses body
+    const body = req.body || {}
+
     // POST /api/auth/register/student
     if (pathname.includes('/register/student') && req.method === 'POST') {
       console.log('✅ Register student endpoint hit')
@@ -37,6 +41,7 @@ export default async function handler(req, res) {
       console.log('📥 Received data:', { name, username, kelas, gender, hasPassword: !!password })
 
       if (!name || !username || !password || !kelas) {
+        console.log('❌ Missing required fields')
         return res.status(400).json({ error: 'Semua field wajib diisi' })
       }
 
@@ -44,31 +49,37 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Password minimal 8 karakter' })
       }
 
+      console.log('🔍 Checking existing username...')
       const existing = await query('SELECT id FROM profiles WHERE username = $1', [username])
       if (existing.length > 0) {
         return res.status(400).json({ error: 'Username sudah dipakai' })
       }
 
+      console.log('🔐 Hashing password...')
       const hashedPassword = await bcrypt.hash(password, 10)
       const userId = randomUUID()
       const avatarType = gender === 'female' ? 'girl1' : 'boy1'
       const email = `${username}@sahabatbk.internal`
 
+      console.log('💾 Inserting user into database...')
       await query(
         `INSERT INTO profiles (id, role, name, username, email, password, kelas, avatar, gender) 
          VALUES ($1, 'student', $2, $3, $4, $5, $6, $7, $8)`,
         [userId, name, username, email, hashedPassword, kelas, avatarType, gender || 'male']
       )
 
+      console.log('💾 Inserting student progress...')
       await query(
         `INSERT INTO student_progress (id, student_id, xp, level, coins) 
          VALUES ($1, $2, 0, 1, 0)`,
         [randomUUID(), userId]
       )
 
+      console.log('🎫 Generating token...')
       const token = generateToken(userId, 'student')
       const profiles = await query('SELECT id, role, name, username, kelas, avatar, gender FROM profiles WHERE id = $1', [userId])
 
+      console.log('✅ Registration successful!')
       return res.json({
         user: { id: userId, email },
         profile: profiles[0],
@@ -117,30 +128,38 @@ export default async function handler(req, res) {
     if (pathname.includes('/login/student') && req.method === 'POST') {
       console.log('✅ Login student endpoint hit')
       const { username, password } = body
+      
+      console.log('📥 Login attempt:', { username, hasPassword: !!password })
 
       if (!username || !password) {
         return res.status(400).json({ error: 'Username dan password wajib diisi' })
       }
 
+      console.log('🔍 Finding user in database...')
       const users = await query(
         "SELECT * FROM profiles WHERE username = $1 AND role = 'student'",
         [username]
       )
 
       if (users.length === 0) {
+        console.log('❌ User not found')
         return res.status(401).json({ error: 'Username atau password salah' })
       }
 
       const user = users[0]
+      console.log('🔐 Verifying password...')
       const validPassword = await bcrypt.compare(password, user.password)
       
       if (!validPassword) {
+        console.log('❌ Invalid password')
         return res.status(401).json({ error: 'Username atau password salah' })
       }
 
+      console.log('🎫 Generating token...')
       const token = generateToken(user.id, user.role)
       const progress = await query('SELECT * FROM student_progress WHERE student_id = $1', [user.id])
 
+      console.log('✅ Login successful!')
       return res.json({
         user: { id: user.id, email: user.email },
         profile: {
@@ -234,9 +253,17 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('❌ Auth error:', err)
+    console.error('Stack:', err.stack)
+    
     if (err.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Token tidak valid' })
     }
-    res.status(500).json({ error: 'Gagal memproses permintaan', detail: err.message })
+    
+    // Return detailed error in development
+    return res.status(500).json({ 
+      error: 'Gagal memproses permintaan', 
+      detail: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    })
   }
 }
