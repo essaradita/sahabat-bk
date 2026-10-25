@@ -92,18 +92,9 @@ export default function AttendancePage() {
   }
 
   function updateStatus(recordId, status) {
-    console.log('Updating status:', recordId, status)
-    setRecords(prev => {
-      const updated = prev.map(r => {
-        if (r.id === recordId) {
-          console.log('Found record, updating status to:', status)
-          return { ...r, status }
-        }
-        return r
-      })
-      console.log('Updated records:', updated)
-      return updated
-    })
+    setRecords(prev => prev.map(r => 
+      r.id === recordId ? { ...r, status } : r
+    ))
     setSaved(false)
   }
 
@@ -368,7 +359,7 @@ export default function AttendancePage() {
               }
               
               return (
-                <div key={`${record.id}-${currentStatus}`} className="card p-3 flex items-center gap-3" style={{ position: 'relative', zIndex: 1 }}>
+                <div key={record.id} className="card p-3 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm shrink-0">
                     {record.studentName[0]}
                   </div>
@@ -381,95 +372,51 @@ export default function AttendancePage() {
                   </div>
 
                   {/* Status buttons */}
-                  <div className="flex gap-1.5 shrink-0 flex-wrap justify-end" style={{ position: 'relative', zIndex: 10 }}>
-                    {/* Hadir */}
+                  <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
                     <button
                       type="button"
-                      onClick={() => {
-                        console.log('HADIR clicked for:', record.id, record.studentName)
-                        updateStatus(record.id, 'hadir')
-                      }}
-                      style={{ 
-                        position: 'relative',
-                        zIndex: 100,
-                        pointerEvents: 'auto',
-                        cursor: 'pointer',
-                        touchAction: 'manipulation'
-                      }}
-                      className={
+                      onClick={() => updateStatus(record.id, 'hadir')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
                         currentStatus === 'hadir'
-                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm'
-                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
-                      }
+                          ? 'bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm'
+                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
                     >
                       Hadir
                     </button>
                     
-                    {/* Izin */}
                     <button
                       type="button"
-                      onClick={() => {
-                        console.log('IZIN clicked for:', record.id, record.studentName)
-                        updateStatus(record.id, 'izin')
-                      }}
-                      style={{ 
-                        position: 'relative',
-                        zIndex: 100,
-                        pointerEvents: 'auto',
-                        cursor: 'pointer',
-                        touchAction: 'manipulation'
-                      }}
-                      className={
+                      onClick={() => updateStatus(record.id, 'izin')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
                         currentStatus === 'izin'
-                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
-                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
-                      }
+                          ? 'bg-blue-100 text-blue-700 border-blue-300 shadow-sm'
+                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
                     >
                       Izin
                     </button>
                     
-                    {/* Sakit */}
                     <button
                       type="button"
-                      onClick={() => {
-                        console.log('SAKIT clicked for:', record.id, record.studentName)
-                        updateStatus(record.id, 'sakit')
-                      }}
-                      style={{ 
-                        position: 'relative',
-                        zIndex: 100,
-                        pointerEvents: 'auto',
-                        cursor: 'pointer',
-                        touchAction: 'manipulation'
-                      }}
-                      className={
+                      onClick={() => updateStatus(record.id, 'sakit')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
                         currentStatus === 'sakit'
-                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-amber-100 text-amber-700 border-amber-300 shadow-sm'
-                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
-                      }
+                          ? 'bg-amber-100 text-amber-700 border-amber-300 shadow-sm'
+                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
                     >
                       Sakit
                     </button>
                     
-                    {/* Alpa */}
                     <button
                       type="button"
-                      onClick={() => {
-                        console.log('ALPA clicked for:', record.id, record.studentName)
-                        updateStatus(record.id, 'alpa')
-                      }}
-                      style={{ 
-                        position: 'relative',
-                        zIndex: 100,
-                        pointerEvents: 'auto',
-                        cursor: 'pointer',
-                        touchAction: 'manipulation'
-                      }}
-                      className={
+                      onClick={() => updateStatus(record.id, 'alpa')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
                         currentStatus === 'alpa'
-                          ? 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-red-100 text-red-700 border-red-300 shadow-sm'
-                          : 'px-2.5 py-1 rounded-lg text-xs font-bold border bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
-                      }
+                          ? 'bg-red-100 text-red-700 border-red-300 shadow-sm'
+                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
                     >
                       Alpa
                     </button>
