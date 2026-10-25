@@ -42,9 +42,13 @@ export function useMissionProgress() {
       }))
     }
 
+    console.log('🔍 Mission Progress dari DB:', missionProgress)
+
     return demoMissions.slice(0, 6).map((mission, idx) => {
       // Cari progress dari database
       const progress = missionProgress.find(p => p.mission_id === mission.id)
+      
+      console.log(`Misi ${idx + 1} (${mission.id}):`, progress ? `Found in DB - status: ${progress.status}` : 'Not in DB yet')
       
       if (progress) {
         // Jika ada di database, gunakan status dari database
@@ -57,14 +61,24 @@ export function useMissionProgress() {
       }
       
       // Jika tidak ada di database, gunakan logika unlock bertahap
-      const previousMissions = demoMissions.slice(0, idx)
-      const previousProgress = previousMissions.map(m => 
-        missionProgress.find(p => p.mission_id === m.id)
-      )
-      const allPreviousCompleted = previousProgress.every(p => p && p.status === 'completed')
+      // Cek semua misi sebelumnya sudah completed atau belum
+      let allPreviousCompleted = true
       
-      // Mission pertama available, sisanya locked kecuali sudah selesai
+      for (let i = 0; i < idx; i++) {
+        const prevMission = demoMissions[i]
+        const prevProgress = missionProgress.find(p => p.mission_id === prevMission.id)
+        
+        if (!prevProgress || prevProgress.status !== 'completed') {
+          allPreviousCompleted = false
+          console.log(`  ❌ Misi sebelumnya (${prevMission.id}) belum completed`)
+          break
+        }
+      }
+      
+      // Mission pertama always available, sisanya tergantung misi sebelumnya
       const status = idx === 0 ? 'available' : (allPreviousCompleted ? 'available' : 'locked')
+      
+      console.log(`  → Status: ${status} (${idx === 0 ? 'first mission' : allPreviousCompleted ? 'all previous completed' : 'previous not completed'})`)
       
       return {
         ...mission,
