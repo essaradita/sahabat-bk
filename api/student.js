@@ -29,6 +29,8 @@ export default async function handler(req, res) {
     const decoded = verifyStudent(req)
     const studentId = decoded.userId
 
+    console.log('👤 Student API request:', { studentId, pathname, method: req.method })
+
     // GET /api/student/missions
     if (pathname === '/api/student/missions' && req.method === 'GET') {
       console.log('📋 Getting student missions for:', studentId)
@@ -49,6 +51,7 @@ export default async function handler(req, res) {
       console.log('🎯 Complete mission request:', { studentId, missionId, score, xpReward, coinReward })
 
       if (!missionId) {
+        console.log('❌ Mission ID missing')
         return res.status(400).json({ error: 'Mission ID required' })
       }
 
@@ -67,13 +70,16 @@ export default async function handler(req, res) {
            WHERE student_id = $2 AND mission_id = $3`,
           [score || 100, studentId, missionId]
         )
+        console.log('✅ Mission progress updated')
       } else {
         console.log('📝 Inserting new mission progress...')
+        const progressId = randomUUID()
         await query(
           `INSERT INTO mission_progress (id, student_id, mission_id, status, score, completed_at)
            VALUES ($1, $2, $3, 'completed', $4, CURRENT_TIMESTAMP)`,
-          [randomUUID(), studentId, missionId, score || 100]
+          [progressId, studentId, missionId, score || 100]
         )
+        console.log('✅ Mission progress inserted with ID:', progressId)
       }
 
       console.log('💰 Updating student progress (XP + coins)...')
@@ -94,10 +100,13 @@ export default async function handler(req, res) {
       })
     }
 
+    console.log('❌ Endpoint not found:', pathname)
     return res.status(404).json({ error: 'Endpoint not found' })
 
   } catch (err) {
-    console.error('Student error:', err)
+    console.error('❌ Student API error:', err)
+    console.error('Error stack:', err.stack)
+    
     if (err.message === 'Token tidak ditemukan') {
       return res.status(401).json({ error: err.message })
     }
@@ -107,6 +116,6 @@ export default async function handler(req, res) {
     if (err.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Token tidak valid' })
     }
-    res.status(500).json({ error: 'Gagal memproses permintaan' })
+    res.status(500).json({ error: 'Gagal memproses permintaan', detail: err.message })
   }
 }
